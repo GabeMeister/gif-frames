@@ -8899,6 +8899,13 @@ react-is@^16.12.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.4:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-on-images-loaded@^2.2.5:
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/react-on-images-loaded/-/react-on-images-loaded-2.2.5.tgz#177d2f064ce647b248e59fc4af3250f81de70c0e"
+  integrity sha512-9p5hDxBBpyl/Z6RgJNZipnswUFzX/QfMaEHAioSfZy/hm8iFlxoBchuXqqdZlRxQ6Xd2HPR3hAusB+6yeM0cXA==
+  dependencies:
+    prop-types "^15.6.2"
+
 react-scripts@3.4.3:
   version "3.4.3"
   resolved "https://registry.yarnpkg.com/react-scripts/-/react-scripts-3.4.3.tgz#21de5eb93de41ee92cd0b85b0e1298d0bb2e6c51"

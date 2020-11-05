@@ -18,7 +18,7 @@ const FrameDisplayWrapper = styled.div`
   }
 `;
 
-export default function FrameDisplay({ index, frameData, onTextMove }) {
+export default function FrameDisplay({ index, frameData, onTextMove = () => { } }) {
   const FONT_SIZE = 32;
   const canvasRef = useRef(null);
   const [frame, setFrame] = useState(frameData);
