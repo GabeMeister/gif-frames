@@ -31,6 +31,20 @@ function App() {
   const textRef = useRef(null);
   const delayRef = useRef(null);
 
+  const onCopyClick = useCallback(() => {
+    // Can't copy last frame to the next one
+    if (frameIdx >= frames.length - 1) {
+      return;
+    }
+
+    let framesCopy = [...frames];
+    let frameToCopy = framesCopy[frameIdx];
+    let textListToCopy = frameToCopy.textList.map(x => ({ ...x }));
+    framesCopy[frameIdx + 1].textList = textListToCopy;
+    setFrames(framesCopy);
+    setFrameIdx(frameIdx + 1);
+  }, [frames, frameIdx, setFrames]);
+
   useEffect(() => {
     // SHORT - Wipe out
     // https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif
@@ -66,7 +80,7 @@ function App() {
     return () => {
       document.removeEventListener('keydown', logKey);
     };
-  }, [frames]);
+  }, [frames, onCopyClick]);
 
   function onAddTextClick() {
     const focusedFrame = frames[frameIdx];
@@ -84,20 +98,6 @@ function App() {
     framesCopy[index] = frame;
     setFrames(framesCopy);
   }
-
-  const onCopyClick = useCallback(() => {
-    // Can't copy last frame to the next one
-    if (frameIdx >= frames.length - 1) {
-      return;
-    }
-
-    let framesCopy = [...frames];
-    let frameToCopy = framesCopy[frameIdx];
-    let textListToCopy = frameToCopy.textList.map(x => ({ ...x }));
-    framesCopy[frameIdx + 1].textList = textListToCopy;
-    setFrames(framesCopy);
-    setFrameIdx(frameIdx + 1);
-  });
 
   function onRenderClick() {
     setRendering(true);
@@ -135,7 +135,7 @@ function App() {
         <button onClick={() => onCopyClick()} className="copy-btn">Copy Current Frame</button>
         <br />
         <br />
-        <button onClick={() => onRenderClick()}>Render Gif</button>
+        <h1>Frame index {frameIdx} out of {frames.length - 1}</h1>
         <br />
         <br />
         <h1>Frame Delay (in ms):</h1>
@@ -147,7 +147,7 @@ function App() {
         />
         <br />
         <br />
-        <h1>Frame index {frameIdx} out of {frames.length - 1}</h1>
+        <button onClick={() => onRenderClick()}>Render Gif</button>
       </ControlPanel>
       <br />
       <FrameWrapper>

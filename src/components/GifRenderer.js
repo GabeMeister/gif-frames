@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import OnImagesLoaded from 'react-on-images-loaded';
 import FrameDisplay from './FrameDisplay';

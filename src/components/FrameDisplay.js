@@ -125,7 +125,7 @@ export default function FrameDisplay({ index, frameData, onTextMove = () => { } 
 
   return (
     <FrameDisplayWrapper className="frame-wrapper">
-      <img className="frame-img" src={frame.dataUrl} />
+      <img className="frame-img" src={frame.dataUrl} alt={`thumbnail${index}`} />
       <canvas
         id={frame.getHash()}
         className="frame-canvas"
