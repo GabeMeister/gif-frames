@@ -19,7 +19,6 @@ const FrameDisplayWrapper = styled.div`
 `;
 
 export default function FrameDisplay({ index, frameData, onTextMove = () => { } }) {
-  const FONT_SIZE = 32;
   const canvasRef = useRef(null);
   const [frame, setFrame] = useState(frameData);
   const [mouseDown, setMouseDown] = useState(false);
@@ -31,11 +30,7 @@ export default function FrameDisplay({ index, frameData, onTextMove = () => { } 
     const ctx = canvasRef.current.getContext('2d');
     // Setup the font style
     ctx.fillStyle = 'red';
-    ctx.font = `${FONT_SIZE}px Impact, Charcoal, sans-serif`;
-  }, []);
-
-  useEffect(() => {
-    const ctx = canvasRef.current.getContext('2d');
+    ctx.font = `${frameData.fontSize}px Impact, Charcoal, sans-serif`;
 
     // Clear canvas and repaint all the things
     ctx.clearRect(0, 0, frame.width, frame.height);
@@ -43,7 +38,7 @@ export default function FrameDisplay({ index, frameData, onTextMove = () => { } 
     const canvasTexts = frame.textList.map(text => {
       return {
         ...text,
-        height: FONT_SIZE,
+        height: frameData.fontSize,
         width: ctx.measureText(text.text).width
       };
     });
@@ -54,7 +49,7 @@ export default function FrameDisplay({ index, frameData, onTextMove = () => { } 
     });
 
     setCanvasTextList(canvasTexts);
-  }, [frame]);
+  }, [frame, frameData.fontSize]);
 
   function isTextClicked(text, x, y) {
     return (

@@ -1,42 +1,11 @@
 import md5 from 'md5';
 
-// class Frame {
-//   constructor(canvas) {
-//     let img = canvas.getImage();
-
-//     this.dataUrl = img.toDataURL();
-//     this.height = img.height;
-//     this.width = img.width;
-//     this.textList = [];
-//   }
-
-//   addText(text) {
-//     this.textList.push({
-//       text,
-//       x: 100,
-//       y: 100
-//     });
-//   }
-
-//   getHash() {
-//     const val = md5(
-//       JSON.stringify(this.dataUrl)
-//       + JSON.stringify(this.textList)
-//       + JSON.stringify(this.height)
-//       + JSON.stringify(this.width)
-//     );
-
-//     return val;
-//   }
-// }
-
-// export default Frame;
-
-function Frame({ dataUrl, textList, height, width }) {
+function Frame({ dataUrl, textList, height, width, fontSize }) {
   this.dataUrl = dataUrl;
   this.textList = textList;
   this.height = height;
   this.width = width;
+  this.fontSize = fontSize;
 }
 
 Frame.prototype.addText = function (text) {
@@ -53,19 +22,21 @@ Frame.prototype.getHash = function () {
     + JSON.stringify(this.textList)
     + JSON.stringify(this.height)
     + JSON.stringify(this.width)
+    + JSON.stringify(this.fontSize)
   );
 
   return val;
 }
 
-Frame.initFromCanvas = function (canvas) {
+Frame.initFromCanvas = function ({ canvas, fontSize = 32 }) {
   let img = canvas.getImage();
 
   return new Frame({
     dataUrl: img.toDataURL(),
     height: img.height,
     width: img.width,
-    textList: []
+    textList: [],
+    fontSize: fontSize
   });
 }
 

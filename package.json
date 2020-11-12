@@ -9,6 +9,7 @@
     "gif-frames": "^1.0.1",
     "gif.js.optimized": "^1.0.1",
     "jquery": "^3.5.1",
+    "lodash.clonedeep": "^4.5.0",
     "md5": "^2.3.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   margin-left: -4000px;
 `;
 
-export default function GifRenderer({ frames, onFinish, delay }) {
+export default function GifRenderer({ frames, onFinish, delay, fontSize = 32 }) {
 
   function onAllImagesLoaded() {
     var gif = new window.GIF({
@@ -30,7 +30,7 @@ export default function GifRenderer({ frames, onFinish, delay }) {
 
       // Setup the font style
       ctx.fillStyle = 'red';
-      ctx.font = `${32}px Impact, Charcoal, sans-serif`;
+      ctx.font = `${fontSize}px Impact, Charcoal, sans-serif`;
 
       // Add image to the canvas
       const img = frameImages[i];
@@ -64,6 +64,7 @@ export default function GifRenderer({ frames, onFinish, delay }) {
               key={f.getHash()}
               index={i}
               frameData={f}
+              fontSize={fontSize}
             />
           );
         })}

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import GifRenderer from './components/GifRenderer';
 import gifFrames from 'gif-frames';
 import $ from 'jquery';
+import cloneDeep from 'lodash.clonedeep';
 
 import './App.css';
 import FrameDisplay from './components/FrameDisplay';
@@ -11,6 +12,10 @@ import Frame from './lib/Frame';
 
 const ControlPanel = styled.div`
   position: fixed;
+  margin: 30px;
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 3px;
 
   .copy-btn {
     width: 200px;
@@ -25,11 +30,13 @@ function App() {
   const [frames, setFrames] = useState([]);
   const [frameIdx, setFrameIdx] = useState(0);
   const [delay, setDelay] = useState(50);
+  const [fontSize, setFontSize] = useState(32);
   const [rendering, setRendering] = useState(false);
   const gifUrlRef = useRef(null);
   const frameIdxRef = useRef(null);
   const textRef = useRef(null);
   const delayRef = useRef(null);
+  const fontSizeRef = useRef(null);
 
   const onCopyClick = useCallback(() => {
     // Can't copy last frame to the next one
@@ -37,36 +44,12 @@ function App() {
       return;
     }
 
-    let framesCopy = [...frames];
-    let frameToCopy = framesCopy[frameIdx];
-    let textListToCopy = frameToCopy.textList.map(x => ({ ...x }));
-    framesCopy[frameIdx + 1].textList = textListToCopy;
+    let framesCopy = cloneDeep(frames);
+    framesCopy[frameIdx + 1].textList = cloneDeep(framesCopy[frameIdx].textList);
+
     setFrames(framesCopy);
     setFrameIdx(frameIdx + 1);
-  }, [frames, frameIdx, setFrames]);
-
-  useEffect(() => {
-    // SHORT - Wipe out
-    // https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif
-
-    if (gifUrl === '') {
-      return;
-    }
-
-    gifFrames({
-      url: gifUrl,
-      frames: 'all',
-      outputType: 'canvas',
-      cumulative: true
-    }).then(frameData => {
-      frameData = frameData.map(frame => {
-        return Frame.initFromCanvas(frame);
-      });
-
-      setFrames(frameData);
-    });
-
-  }, [gifUrl]);
+  }, [frames, frameIdx]);
 
   useEffect(() => {
     // Setup global hotkey for new frame
@@ -82,11 +65,42 @@ function App() {
     };
   }, [frames, onCopyClick]);
 
-  function onAddTextClick() {
-    const focusedFrame = frames[frameIdx];
-    focusedFrame.addText(textRef.current.value);
+  useEffect(() => {
+    setFrames(frames => {
+      for (let i = 0; i < frames.length; i++) {
+        frames[i].fontSize = cloneDeep(fontSize);
+      }
+      return frames;
+    });
+  }, [fontSize]);
 
-    setFrames([...frames]);
+  function fetchGifContents() {
+    // SHORT - Wipe out
+    // https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif
+
+    if (gifUrl === '') {
+      return;
+    }
+
+    gifFrames({
+      url: gifUrl,
+      frames: 'all',
+      outputType: 'canvas',
+      cumulative: true
+    }).then(frameData => {
+      frameData = frameData.map(frame => {
+        return Frame.initFromCanvas({ canvas: frame, fontSize });
+      });
+
+      setFrames(frameData);
+    });
+  }
+
+  function onAddTextClick() {
+    const framesCopy = cloneDeep(frames);
+    framesCopy[frameIdx].addText(textRef.current.value);
+
+    setFrames(framesCopy);
   }
 
   function onFrameIdxChange(e) {
@@ -94,7 +108,7 @@ function App() {
   }
 
   function onTextMove({ frame, index }) {
-    let framesCopy = [...frames];
+    let framesCopy = cloneDeep(frames);
     framesCopy[index] = frame;
     setFrames(framesCopy);
   }
@@ -107,16 +121,16 @@ function App() {
     setRendering(false);
   }
 
-  function onGifUrlEntered() {
-    setGifUrl(gifUrlRef.current.value);
+  function onFontSizeChange() {
+    setFontSize(parseInt(fontSizeRef.current.value));
   }
 
   return (
     <div className="App">
       <ControlPanel>
         <h1>Gif Url:</h1>
-        <input ref={gifUrlRef} type="text" />{' '}
-        <button onClick={onGifUrlEntered}>Enter</button>
+        <input ref={gifUrlRef} type="text" value={gifUrl} onChange={() => setGifUrl(gifUrlRef.current.value)} />{' '}
+        <button onClick={fetchGifContents}>Enter</button>
         <br />
         <br />
         <h1>Text:</h1>
@@ -132,11 +146,19 @@ function App() {
         <button onClick={() => onAddTextClick()}>Add Text</button>
         <br />
         <br />
+        <h1>Font Size (in px):</h1>
+        <input
+          ref={fontSizeRef}
+          type="number"
+          value={fontSize}
+          onChange={onFontSizeChange}
+        />
+        <br />
+        <br />
         <button onClick={() => onCopyClick()} className="copy-btn">Copy Current Frame</button>
         <br />
         <br />
         <h1>Frame index {frameIdx} out of {frames.length - 1}</h1>
-        <br />
         <br />
         <h1>Frame Delay (in ms):</h1>
         <input
@@ -161,7 +183,7 @@ function App() {
         )}
       </FrameWrapper>
       {rendering && (
-        <GifRenderer frames={frames} onFinish={onRenderFinish} delay={delay} />
+        <GifRenderer frames={frames} onFinish={onRenderFinish} delay={delay} fontSize={fontSize} />
       )}
     </div>
   );
