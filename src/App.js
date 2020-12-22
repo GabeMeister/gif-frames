@@ -1,27 +1,15 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import styled from 'styled-components';
-import GifRenderer from './components/GifRenderer';
+import 'tailwindcss/tailwind.css';
 import gifFrames from 'gif-frames';
 import $ from 'jquery';
 import cloneDeep from 'lodash.clonedeep';
 
 import './App.css';
-import FrameDisplay from './components/FrameDisplay';
-import FrameWrapper from './components/FrameReel';
+import FrameImg from './components/FrameImg';
+import FrameCanvas from './components/FrameCanvas';
+import RightHalf from './components/RightHalf';
 import Frame from './lib/Frame';
-
-const ControlPanel = styled.div`
-  position: fixed;
-  margin: 30px;
-  background-color: #f5f5f5;
-  padding: 20px;
-  border-radius: 3px;
-
-  .copy-btn {
-    width: 200px;
-    height: 75px;
-  }
-`;
+import GifRenderer from './components/GifRenderer';
 
 window.$ = $;
 
@@ -32,6 +20,9 @@ function App() {
   const [delay, setDelay] = useState(50);
   const [fontSize, setFontSize] = useState(32);
   const [rendering, setRendering] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const [autoplaying, setAutoplaying] = useState(false);
+  const [autoplayCounter, setAutoplayCounter] = useState(3);
   const gifUrlRef = useRef(null);
   const frameIdxRef = useRef(null);
   const textRef = useRef(null);
@@ -74,6 +65,34 @@ function App() {
     });
   }, [fontSize]);
 
+  useEffect(() => {
+    let id = 0;
+
+    if (autoplaying) {
+      id = setInterval(() => {
+        // Change frame on GO (3, 2, 1...GO)
+        const frameChanging = autoplayCounter === 0;
+
+        // If we aren't changing the frame, then we just decrement the counter
+        if (!frameChanging) {
+          setAutoplayCounter(c => (c - 1));
+        }
+        // We are changing the frame
+        else if (frameChanging && frameIdx < frames.length - 1) {
+          setAutoplayCounter(c => (c + 3));
+          onCopyClick();
+        }
+        // We reached the final frame
+        else if (frameChanging && frameIdx === frames.length - 1) {
+          clearInterval(id);
+          setAutoplaying(a => !a);
+        }
+      }, 150);
+    }
+
+    return () => clearInterval(id);
+  }, [autoplaying, autoplayCounter, onCopyClick, frameIdx, frames.length]);
+
   function fetchGifContents() {
     // SHORT - Wipe out
     // https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif
@@ -82,17 +101,20 @@ function App() {
       return;
     }
 
+    setFetchLoading(true);
+
     gifFrames({
       url: gifUrl,
       frames: 'all',
       outputType: 'canvas',
       cumulative: true
     }).then(frameData => {
-      frameData = frameData.map(frame => {
-        return Frame.initFromCanvas({ canvas: frame, fontSize });
+      frameData = frameData.map(canvas => {
+        return Frame.initFromCanvas({ canvas, fontSize });
       });
 
       setFrames(frameData);
+      setFetchLoading(false);
     });
   }
 
@@ -104,7 +126,11 @@ function App() {
   }
 
   function onFrameIdxChange(e) {
-    setFrameIdx(parseInt(frameIdxRef.current.value));
+    const newFrameIdx = parseInt(frameIdxRef.current.value) - 1;
+
+    if (newFrameIdx >= 0 && newFrameIdx < frames.length) {
+      setFrameIdx(newFrameIdx);
+    }
   }
 
   function onTextMove({ frame, index }) {
@@ -114,7 +140,9 @@ function App() {
   }
 
   function onRenderClick() {
+    console.log('setting rendering...');
     setRendering(true);
+    console.log('after');
   }
 
   function onRenderFinish() {
@@ -126,64 +154,116 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <ControlPanel>
-        <h1>Gif Url:</h1>
-        <input ref={gifUrlRef} type="text" value={gifUrl} onChange={() => setGifUrl(gifUrlRef.current.value)} />{' '}
-        <button onClick={fetchGifContents}>Enter</button>
+    <div className="App font-sans">
+      <div className="p-6">
+        <h1 className="text-2xl">Gif Url:</h1>
+        <input
+          ref={gifUrlRef}
+          type="text"
+          value={gifUrl}
+          onChange={() => setGifUrl(gifUrlRef.current.value)}
+          className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3"
+        />{' '}
+        <button
+          onClick={fetchGifContents}
+          className={`${fetchLoading ? 'disabled:opacity-50 bg-gray-300' : 'bg-blue-300'} p-2.5 rounded`}
+        >
+          {fetchLoading
+            ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
+            : <span>Enter</span>
+          }
+        </button>
         <br />
         <br />
-        <h1>Text:</h1>
-        <input ref={textRef} type="text" />
+        <h1 className="text-2xl">Text:</h1>
+        <input
+          ref={textRef}
+          type="text"
+          className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300  mr-3"
+        />
+        <button
+          onClick={() => onAddTextClick()}
+          className="bg-blue-300 p-2.5 rounded"
+        >Add Text</button>
+        <h1 className="text-2xl">Frame Index:</h1>
         <input
           ref={frameIdxRef}
           type="number"
-          value={frameIdx}
+          value={frameIdx + 1}
           onChange={onFrameIdxChange}
+          className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3"
         />
         <br />
         <br />
-        <button onClick={() => onAddTextClick()}>Add Text</button>
-        <br />
-        <br />
-        <h1>Font Size (in px):</h1>
+        <h1 className="text-2xl">Font Size (in px):</h1>
         <input
           ref={fontSizeRef}
           type="number"
           value={fontSize}
           onChange={onFontSizeChange}
+          className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3"
         />
         <br />
         <br />
-        <button onClick={() => onCopyClick()} className="copy-btn">Copy Current Frame</button>
+        <button
+          onClick={() => onCopyClick()}
+          className="bg-blue-300 p-2.5 rounded"
+        >Copy Current Frame</button>
         <br />
         <br />
-        <h1>Frame index {frameIdx} out of {frames.length - 1}</h1>
+        <h1 className="text-2xl">Frame index {frameIdx + 1} out of {frames.length}</h1>
         <br />
-        <h1>Frame Delay (in ms):</h1>
+        <h1 className="text-2xl">Frame Delay (in ms):</h1>
         <input
           ref={delayRef}
           type="number"
           value={delay}
           onChange={() => setDelay(parseInt(delayRef.current.value))}
+          className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3"
         />
         <br />
         <br />
-        <button onClick={() => onRenderClick()}>Render Gif</button>
-      </ControlPanel>
+        <button
+          onClick={() => setAutoplaying(!autoplaying)}
+          className={`${autoplaying ? 'bg-red-500' : 'bg-blue-300'} p-2.5 rounded`}
+        >{autoplaying ? 'Stop Auto-play' : 'Begin Auto-play'}</button>
+        <br />
+        <br />
+        <button
+          onClick={() => onRenderClick()}
+          className={`${rendering ? 'bg-gray-500' : 'bg-green-500'} p-2.5 rounded`}
+        >
+          {rendering
+            ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
+            : <span>Finish</span>
+          }
+        </button>
+      </div>
+      <h1 className="absolute text-9xl">{autoplaying ? autoplayCounter : ''}</h1>
       <br />
-      <FrameWrapper>
+      <RightHalf>
         {!!frames.length && (
-          <FrameDisplay
-            key={frames[frameIdx].getHash()}
-            index={frameIdx}
-            frameData={frames[frameIdx]}
-            onTextMove={onTextMove}
-          />
+          <div className="p-6">
+            <FrameImg
+              key={`img-${frames[frameIdx].getHash()}`}
+              frameData={frames[frameIdx]}
+            />
+            <FrameCanvas
+              key={`canvas-${frames[frameIdx].getHash()}`}
+              index={frameIdx}
+              frameData={frames[frameIdx]}
+              onTextMove={onTextMove}
+            />
+          </div>
         )}
-      </FrameWrapper>
+      </RightHalf>
       {rendering && (
-        <GifRenderer frames={frames} onFinish={onRenderFinish} delay={delay} fontSize={fontSize} />
+        <GifRenderer
+          frames={frames}
+          onFinish={onRenderFinish}
+          delay={delay}
+          fontSize={fontSize}
+        />
       )}
     </div>
   );

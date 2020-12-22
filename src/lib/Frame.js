@@ -1,6 +1,6 @@
 import md5 from 'md5';
 
-function Frame({ dataUrl, textList, height, width, fontSize }) {
+function Frame({ dataUrl, height, width, textList = [], fontSize = 32 }) {
   this.dataUrl = dataUrl;
   this.textList = textList;
   this.height = height;
@@ -11,8 +11,8 @@ function Frame({ dataUrl, textList, height, width, fontSize }) {
 Frame.prototype.addText = function (text) {
   this.textList.push({
     text,
-    x: 100,
-    y: 100
+    x: this.width / 2,
+    y: this.height / 2
   });
 }
 
@@ -36,7 +36,7 @@ Frame.initFromCanvas = function ({ canvas, fontSize = 32 }) {
     height: img.height,
     width: img.width,
     textList: [],
-    fontSize: fontSize
+    fontSize
   });
 }
 

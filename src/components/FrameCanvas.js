@@ -1,24 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import styled from 'styled-components';
 
-const FrameDisplayWrapper = styled.div`
-  color: red;
-  position: relative;
-
-  .frame-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  .frame-label {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-`;
-
-export default function FrameDisplay({ index, frameData, onTextMove = () => { } }) {
+export default function FrameCanvas({ index, frameData, onTextMove = () => { } }) {
   const canvasRef = useRef(null);
   const [frame, setFrame] = useState(frameData);
   const [mouseDown, setMouseDown] = useState(false);
@@ -119,18 +101,17 @@ export default function FrameDisplay({ index, frameData, onTextMove = () => { } 
   }
 
   return (
-    <FrameDisplayWrapper className="frame-wrapper">
-      <img className="frame-img" src={frame.dataUrl} alt={`thumbnail${index}`} />
+    <>
       <canvas
         id={frame.getHash()}
-        className="frame-canvas"
         ref={canvasRef}
         height={frame.height}
         width={frame.width}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseMove={onMouseMove}
+        className="frame-canvas absolute"
       />
-    </FrameDisplayWrapper>
+    </>
   );
 };

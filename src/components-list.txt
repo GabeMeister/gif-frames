@@ -1,0 +1,47 @@
+=== Molecules ===
+Thumbnail
+Button
+NumberInput
+Slider
+Label
+TextInput
+NavArrow
+Title
+
+
+
+
+=== HOME PAGE ===
+<HomePage>
+  <Title></Title>
+  <Spacer></Spacer>
+  <Label></Label>
+  <GifInput></GifInput>
+</HomePage>
+
+
+
+=== EDITOR PAGE ===
+<Editor>
+  <Carousel>
+    <Thumbnail></Thumbnail>
+    <Thumbnail></Thumbnail>
+    <FrameWrapper>
+      <FrameCounter></FrameCounter>
+      <PreviewBtn></PreviewBtn>
+      <Frame></Frame>
+      <FrameNavigation>
+        <LeftArrow></LeftArrow>
+        <CopyBtn></CopyBtn>
+        <RightArrow></RightArrow>
+      </FrameNavigation>
+    </FrameWrapper>
+    <Thumbnail></Thumbnail>
+    <Thumbnail></Thumbnail>
+  </Carousel>
+  <ControlPanel>
+    <TextInput></TextInput>
+    <SpeedInput></SpeedInput>
+    <FontSizeInput></FontSizeInput>
+  </ControlPanel>
+</Editor>

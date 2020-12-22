@@ -1,12 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
 import OnImagesLoaded from 'react-on-images-loaded';
-import FrameDisplay from './FrameDisplay';
-
-const Wrapper = styled.div`
-  display: hidden;
-  margin-left: -4000px;
-`;
+import FrameImg from './FrameImg';
+import FrameCanvas from './FrameCanvas';
 
 export default function GifRenderer({ frames, onFinish, delay, fontSize = 32 }) {
 
@@ -56,19 +51,25 @@ export default function GifRenderer({ frames, onFinish, delay, fontSize = 32 }) 
   }
 
   return (
-    <Wrapper className="gif-renderer">
+    <div className="gif-renderer hidden -ml-96">
       <OnImagesLoaded onLoaded={onAllImagesLoaded}>
         {frames.map((f, i) => {
           return (
-            <FrameDisplay
-              key={f.getHash()}
-              index={i}
-              frameData={f}
-              fontSize={fontSize}
-            />
+            <div key={`renderer-frame-${f.getHash()}`}>
+              <FrameImg
+                key={`renderer-img-${f.getHash()}`}
+                index={i}
+                frameData={f}
+              />
+              <FrameCanvas
+                key={`renderer-canvas-${f.getHash()}`}
+                index={i}
+                frameData={f}
+              />
+            </div>
           );
         })}
       </OnImagesLoaded>
-    </Wrapper>
+    </div>
   );
 };
