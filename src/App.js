@@ -34,7 +34,7 @@ function App() {
   const delayRef = useRef(null);
   const fontSizeRef = useRef(null);
   const textLayerModelRef = useRef(null);
-  const [_, forceUpdate] = useReducer(x => x + 1, 0);
+  const [_, forceUpdate] = useReducer(x => x + 1, 0); // eslint-disable-line no-unused-vars
 
   const renderCurrentFrame = useCallback(() => {
     let framesModelCopy = cloneDeep(framesModel);
