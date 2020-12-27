@@ -1,23 +1,28 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import 'tailwindcss/tailwind.css';
+import React, { useRef, useEffect, useState, useCallback, useReducer } from 'react';
 import gifFrames from 'gif-frames';
 import $ from 'jquery';
 import cloneDeep from 'lodash.clonedeep';
 
 import './App.css';
-import FrameImg from './components/FrameImg';
-import FrameCanvas from './components/FrameCanvas';
+import ImageLayer from './components/ImageLayer';
+import TextLayer from './components/TextLayer';
 import RightHalf from './components/RightHalf';
-import Frame from './lib/Frame';
 import GifRenderer from './components/GifRenderer';
+import FrameModel from './models/FrameModel';
+import TextLayerModel from './models/TextLayerModel';
 
 window.$ = $;
 
 function App() {
+  // DEBUGGING PURPOSES - Short Wipe Out Gif
+  // const [gifUrl, setGifUrl] = useState('https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif');
+  // const [delay, setDelay] = useState(200);
+
   const [gifUrl, setGifUrl] = useState('');
-  const [frames, setFrames] = useState([]);
-  const [frameIdx, setFrameIdx] = useState(0);
   const [delay, setDelay] = useState(50);
+
+  const [framesModel, setFramesModel] = useState([]);
+  const [frameIdx, setFrameIdx] = useState(0);
   const [fontSize, setFontSize] = useState(32);
   const [rendering, setRendering] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
@@ -28,25 +33,37 @@ function App() {
   const textRef = useRef(null);
   const delayRef = useRef(null);
   const fontSizeRef = useRef(null);
+  const textLayerModelRef = useRef(null);
+  const [_, forceUpdate] = useReducer(x => x + 1, 0);
 
-  const onCopyClick = useCallback(() => {
+  const renderCurrentFrame = useCallback(() => {
+    let framesModelCopy = cloneDeep(framesModel);
+    framesModelCopy[frameIdx].textLayerModel = cloneDeep(textLayerModelRef.current);
+
+    setFramesModel(framesModelCopy);
+  }, [framesModel, frameIdx]);
+
+  const onFrameSubmit = useCallback(() => {
     // Can't copy last frame to the next one
-    if (frameIdx >= frames.length - 1) {
+    if (frameIdx >= framesModel.length - 1) {
       return;
     }
 
-    let framesCopy = cloneDeep(frames);
-    framesCopy[frameIdx + 1].textList = cloneDeep(framesCopy[frameIdx].textList);
+    renderCurrentFrame();
 
-    setFrames(framesCopy);
     setFrameIdx(frameIdx + 1);
-  }, [frames, frameIdx]);
+  }, [framesModel, frameIdx, renderCurrentFrame]);
 
   useEffect(() => {
-    // Setup global hotkey for new frame
     function logKey(e) {
+      // Setup global hotkey for creating a new frame
       if (e.code === 'Enter') {
-        onCopyClick();
+        onFrameSubmit();
+      }
+
+      // Setup global hotkey for beginning autoplay
+      if (e.code === 'Space') {
+        setAutoplaying(!autoplaying);
       }
     }
     document.addEventListener('keydown', logKey);
@@ -54,16 +71,20 @@ function App() {
     return () => {
       document.removeEventListener('keydown', logKey);
     };
-  }, [frames, onCopyClick]);
+  }, [framesModel, onFrameSubmit, autoplaying]);
 
   useEffect(() => {
-    setFrames(frames => {
-      for (let i = 0; i < frames.length; i++) {
-        frames[i].fontSize = cloneDeep(fontSize);
+    if (framesModel.length) {
+      textLayerModelRef.current.fontSize = fontSize;
+    }
+
+    setFramesModel(frames => {
+      for (let i = 0; i < framesModel.length; i++) {
+        framesModel[i].fontSize = cloneDeep(fontSize);
       }
       return frames;
     });
-  }, [fontSize]);
+  }, [fontSize, framesModel]);
 
   useEffect(() => {
     let id = 0;
@@ -78,25 +99,22 @@ function App() {
           setAutoplayCounter(c => (c - 1));
         }
         // We are changing the frame
-        else if (frameChanging && frameIdx < frames.length - 1) {
+        else if (frameChanging && frameIdx < framesModel.length - 1) {
           setAutoplayCounter(c => (c + 3));
-          onCopyClick();
+          onFrameSubmit();
         }
         // We reached the final frame
-        else if (frameChanging && frameIdx === frames.length - 1) {
+        else if (frameChanging && frameIdx === framesModel.length - 1) {
           clearInterval(id);
           setAutoplaying(a => !a);
         }
-      }, 150);
+      }, 200);
     }
 
     return () => clearInterval(id);
-  }, [autoplaying, autoplayCounter, onCopyClick, frameIdx, frames.length]);
+  }, [autoplaying, autoplayCounter, onFrameSubmit, frameIdx, framesModel.length]);
 
-  function fetchGifContents() {
-    // SHORT - Wipe out
-    // https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif
-
+  function onUrlEntered() {
     if (gifUrl === '') {
       return;
     }
@@ -108,41 +126,59 @@ function App() {
       frames: 'all',
       outputType: 'canvas',
       cumulative: true
-    }).then(frameData => {
-      frameData = frameData.map(canvas => {
-        return Frame.initFromCanvas({ canvas, fontSize });
+    }).then(frames => {
+      const frameData = frames.map(frame => {
+        const canvas = frame.getImage();
+
+        return new FrameModel({ canvas });
       });
 
-      setFrames(frameData);
+      // Set text layer the user will interact with by taking a look at the first frame
+      const firstImageFrame = frameData[0].imageLayerModel;
+      const initialTextLayerModel = new TextLayerModel({
+        height: firstImageFrame.height,
+        width: firstImageFrame.width
+      });
+      textLayerModelRef.current = initialTextLayerModel;
+
+      setFramesModel(frameData);
       setFetchLoading(false);
     });
   }
 
   function onAddTextClick() {
-    const framesCopy = cloneDeep(frames);
-    framesCopy[frameIdx].addText(textRef.current.value);
+    const newText = textRef.current.value;
+    const textLayerModelCopy = cloneDeep(textLayerModelRef.current);
 
-    setFrames(framesCopy);
+    textLayerModelCopy.addText(newText);
+    textLayerModelRef.current = cloneDeep(textLayerModelCopy);
+
+    forceUpdate();
   }
 
   function onFrameIdxChange(e) {
     const newFrameIdx = parseInt(frameIdxRef.current.value) - 1;
 
-    if (newFrameIdx >= 0 && newFrameIdx < frames.length) {
+    if (newFrameIdx >= 0 && newFrameIdx < framesModel.length) {
+      renderCurrentFrame();
+
+      // Set the text list back to match the current frame
+      textLayerModelRef.current = cloneDeep(framesModel[newFrameIdx].textLayerModel);
+
       setFrameIdx(newFrameIdx);
+      forceUpdate();
     }
   }
 
-  function onTextMove({ frame, index }) {
-    let framesCopy = cloneDeep(frames);
-    framesCopy[index] = frame;
-    setFrames(framesCopy);
+  function onTextMove({ textLayerData }) {
+    textLayerModelRef.current = textLayerData;
   }
 
   function onRenderClick() {
-    console.log('setting rendering...');
+    // Make sure we render the current frame we are on (typically the last one)
+    renderCurrentFrame();
+
     setRendering(true);
-    console.log('after');
   }
 
   function onRenderFinish() {
@@ -165,7 +201,7 @@ function App() {
           className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3"
         />{' '}
         <button
-          onClick={fetchGifContents}
+          onClick={onUrlEntered}
           className={`${fetchLoading ? 'disabled:opacity-50 bg-gray-300' : 'bg-blue-300'} p-2.5 rounded`}
         >
           {fetchLoading
@@ -206,12 +242,12 @@ function App() {
         <br />
         <br />
         <button
-          onClick={() => onCopyClick()}
+          onClick={() => onFrameSubmit()}
           className="bg-blue-300 p-2.5 rounded"
-        >Copy Current Frame</button>
+        >Next Frame</button>
         <br />
         <br />
-        <h1 className="text-2xl">Frame index {frameIdx + 1} out of {frames.length}</h1>
+        <h1 className="text-2xl">Frame index {frameIdx + 1} out of {framesModel.length}</h1>
         <br />
         <h1 className="text-2xl">Frame Delay (in ms):</h1>
         <input
@@ -242,16 +278,18 @@ function App() {
       <h1 className="absolute text-9xl">{autoplaying ? autoplayCounter : ''}</h1>
       <br />
       <RightHalf>
-        {!!frames.length && (
+        {!!framesModel.length && (
           <div className="p-6">
-            <FrameImg
-              key={`img-${frames[frameIdx].getHash()}`}
-              frameData={frames[frameIdx]}
+            <ImageLayer
+              key={`img-${framesModel[frameIdx].getHash()}`}
+              imageLayerModel={framesModel[frameIdx].imageLayerModel}
             />
-            <FrameCanvas
-              key={`canvas-${frames[frameIdx].getHash()}`}
-              index={frameIdx}
-              frameData={frames[frameIdx]}
+            <TextLayer
+              // We want to re-render the text layer when we (1) add some new
+              // text, (2) change the font size or (3) adjust the frame index
+              // when NOT autoplaying
+              key={`${textLayerModelRef.current.textList.length}-${textLayerModelRef.current.fontSize}-${!autoplaying ? frameIdx : ''}`}
+              textLayerModel={textLayerModelRef.current}
               onTextMove={onTextMove}
             />
           </div>
@@ -259,7 +297,7 @@ function App() {
       </RightHalf>
       {rendering && (
         <GifRenderer
-          frames={frames}
+          framesModel={framesModel}
           onFinish={onRenderFinish}
           delay={delay}
           fontSize={fontSize}

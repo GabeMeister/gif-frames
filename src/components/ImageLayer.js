@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function FrameImg({ frameData }) {
+export default function ImageLayer({ imageLayerModel }) {
   return (
     <img
-      src={frameData.dataUrl}
+      src={imageLayerModel.dataUrl}
       alt={`frame-thumbnail`}
       className="frame-img absolute select-none"
     />

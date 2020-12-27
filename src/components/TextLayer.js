@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
+import cloneDeep from 'lodash.clonedeep';
 
-export default function FrameCanvas({ index, frameData, onTextMove = () => { } }) {
+export default function TextLayer({ textLayerModel, onTextMove = () => { } }) {
   const canvasRef = useRef(null);
-  const [frame, setFrame] = useState(frameData);
+  const [textLayerData, setTextLayerData] = useState(textLayerModel);
   const [mouseDown, setMouseDown] = useState(false);
   const [coord, setCoord] = useState({ x: -1, y: -1 });
   const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
@@ -12,15 +13,15 @@ export default function FrameCanvas({ index, frameData, onTextMove = () => { } }
     const ctx = canvasRef.current.getContext('2d');
     // Setup the font style
     ctx.fillStyle = 'red';
-    ctx.font = `${frameData.fontSize}px Impact, Charcoal, sans-serif`;
+    ctx.font = `${textLayerData.fontSize}px Impact, Charcoal, sans-serif`;
 
     // Clear canvas and repaint all the things
-    ctx.clearRect(0, 0, frame.width, frame.height);
+    ctx.clearRect(0, 0, textLayerData.width, textLayerData.height);
 
-    const canvasTexts = frame.textList.map(text => {
+    const canvasTexts = textLayerData.textList.map(text => {
       return {
         ...text,
-        height: frameData.fontSize,
+        height: textLayerData.fontSize,
         width: ctx.measureText(text.text).width
       };
     });
@@ -31,7 +32,7 @@ export default function FrameCanvas({ index, frameData, onTextMove = () => { } }
     });
 
     setCanvasTextList(canvasTexts);
-  }, [frame, frameData.fontSize]);
+  }, [textLayerData]);
 
   function isTextClicked(text, x, y) {
     return (
@@ -65,30 +66,29 @@ export default function FrameCanvas({ index, frameData, onTextMove = () => { } }
       x: -1,
       y: -1
     });
-
-    onTextMove({
-      frame,
-      index
-    });
   }
 
   function onMouseMove(e) {
     if (mouseDown && selectedTextIndex >= 0) {
-      let frameClone = Object.assign(Object.create(Object.getPrototypeOf(frame)), frame)
+      let textLayerDataClone = cloneDeep(textLayerData);
       const pos = getMousePos(canvasRef.current, e);
 
       const xChange = pos.x - coord.x;
       const yChange = pos.y - coord.y;
 
-      frameClone.textList[selectedTextIndex].x += xChange;
-      frameClone.textList[selectedTextIndex].y += yChange;
+      textLayerDataClone.textList[selectedTextIndex].x += xChange;
+      textLayerDataClone.textList[selectedTextIndex].y += yChange;
 
       setCoord({
         x: pos.x,
         y: pos.y
       });
 
-      setFrame(frameClone);
+      setTextLayerData(textLayerDataClone);
+
+      onTextMove({
+        textLayerData
+      });
     }
   }
 
@@ -103,10 +103,10 @@ export default function FrameCanvas({ index, frameData, onTextMove = () => { } }
   return (
     <>
       <canvas
-        id={frame.getHash()}
+        id={textLayerData.getHash()}
         ref={canvasRef}
-        height={frame.height}
-        width={frame.width}
+        height={textLayerData.height}
+        width={textLayerData.width}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseMove={onMouseMove}
