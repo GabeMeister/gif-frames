@@ -11,9 +11,15 @@ export default function HomePage() {
   const [fetchLoading, setFetchLoading] = useState(false);
   const gifUrlRef = useRef(null);
 
+  /*
+   * DEBUGGING PURPOSES
+   */
   useEffect(() => {
-    // DEBUGGING PURPOSES - Set input to a short wipe-out gif
-    // setGifUrl('https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif');
+    // short wipe-out gif (5 frames)
+    setGifUrl('https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif');
+
+    // long wipe-out gif (66 frames)
+    setGifUrl('https://media.giphy.com/media/qhoABJOROS9kQ/giphy.gif');
   }, []);
 
   function onUrlEntered() {

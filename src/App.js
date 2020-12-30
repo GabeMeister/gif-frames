@@ -18,9 +18,6 @@ function App() {
       <Router>
         <div>
           <Switch>
-            <Route path='/home'>
-              <HomePage />
-            </Route>
             <Route path='/editor'>
               <EditorPage />
             </Route>

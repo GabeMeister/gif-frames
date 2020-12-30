@@ -30,9 +30,11 @@ export default function EditorPage() {
   const [rendering, setRendering] = useState(false);
   const [autoplaying, setAutoplaying] = useState(false);
   const [autoplayCounter, setAutoplayCounter] = useState(3);
+  const [autoplayDelay, setAutoplayDelay] = useState(200);
   const frameIdxRef = useRef(null);
   const textRef = useRef(null);
   const delayRef = useRef(null);
+  const autoplayRef = useRef(null);
   const fontSizeRef = useRef(null);
   const textLayerModelRef = useRef(null);
   const [_, forceUpdate] = useReducer(x => x + 1, 0); // eslint-disable-line no-unused-vars
@@ -142,11 +144,11 @@ export default function EditorPage() {
           clearInterval(id);
           setAutoplaying(a => !a);
         }
-      }, 200);
+      }, autoplayDelay);
     }
 
     return () => clearInterval(id);
-  }, [autoplaying, autoplayCounter, onFrameSubmit, frameIdx, framesModel.length]);
+  }, [autoplaying, autoplayCounter, onFrameSubmit, frameIdx, framesModel.length, autoplayDelay]);
 
   function onAddTextClick() {
     const newText = textRef.current.value;
@@ -196,7 +198,7 @@ export default function EditorPage() {
       {gifUrl ? (
         <div className="App font-sans">
           <div className="p-6">
-            <Link to="/home">
+            <Link to="/">
               <button className="bg-blue-300 p-2.5 rounded">
                 ← Restart
           </button>
@@ -251,6 +253,16 @@ export default function EditorPage() {
             />
             <br />
             <br />
+            <h1 className="text-2xl">Autoplay Delay (in ms):</h1>
+            <input
+              ref={autoplayRef}
+              type="number"
+              value={autoplayDelay}
+              onChange={() => setAutoplayDelay(parseInt(autoplayRef.current.value))}
+              className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3"
+            />
+            <br />
+            <br />
             <button
               onClick={() => setAutoplaying(!autoplaying)}
               className={`${autoplaying ? 'bg-red-500' : 'bg-blue-300'} p-2.5 rounded`}
@@ -299,9 +311,8 @@ export default function EditorPage() {
           )}
         </div>
       ) : (
-          <Redirect to="/home" />
+          <Redirect to="/" />
         )}
     </>
-
   );
 }
