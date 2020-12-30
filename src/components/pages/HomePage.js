@@ -15,11 +15,11 @@ export default function HomePage() {
    * DEBUGGING PURPOSES
    */
   useEffect(() => {
-    // short wipe-out gif (5 frames)
-    setGifUrl('https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif');
+    // // short wipe-out gif (5 frames)
+    // setGifUrl('https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif');
 
-    // long wipe-out gif (66 frames)
-    setGifUrl('https://media.giphy.com/media/qhoABJOROS9kQ/giphy.gif');
+    // // long wipe-out gif (66 frames)
+    // setGifUrl('https://media.giphy.com/media/qhoABJOROS9kQ/giphy.gif');
   }, []);
 
   function onUrlEntered() {

@@ -19,11 +19,8 @@ function useQuery() {
 }
 
 export default function EditorPage() {
-  const [delay, setDelay] = useState(200);
-
-  // const [delay, setDelay] = useState(50);
-
   let query = useQuery();
+  const [delay, setDelay] = useState(200);
   const [framesModel, setFramesModel] = useState([]);
   const [frameIdx, setFrameIdx] = useState(0);
   const [fontSize, setFontSize] = useState(32);
