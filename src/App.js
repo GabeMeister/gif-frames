@@ -13,9 +13,6 @@ import HomePage from './components/pages/HomePage';
 window.$ = $;
 
 function App() {
-  const query = new URLSearchParams(window.location.search);
-  console.log('query gifUrl', query.get('gifUrl'));
-
   return (
     <div className="font-sans">
       <Router>

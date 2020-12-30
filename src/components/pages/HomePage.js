@@ -13,7 +13,7 @@ export default function HomePage() {
 
   useEffect(() => {
     // DEBUGGING PURPOSES - Set input to a short wipe-out gif
-    setGifUrl('https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif');
+    // setGifUrl('https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif');
   }, []);
 
   function onUrlEntered() {
@@ -22,13 +22,15 @@ export default function HomePage() {
       if (gifUrl.endsWith('.gif')) {
         setRedirecting(true);
       }
+
+      setFetchLoading(false);
     }, 300);
   }
 
   return (
     <>
       {redirecting ? (
-        console.log(`/editor?gifUrl=${gifUrl}`) || <Redirect to={`/editor?gifUrl=${gifUrl}`} />
+        <Redirect to={`/editor?gifUrl=${gifUrl}`} />
       ) : (
           <div className="p-6 text-center">
             <h1 className="text-2xl">Enter gif url:</h1>
@@ -37,7 +39,7 @@ export default function HomePage() {
               type="text"
               value={gifUrl}
               onChange={() => setGifUrl(gifUrlRef.current.value)}
-              className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3"
+              className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3 mt-3"
             />{' '}
             <button
               onClick={onUrlEntered}
