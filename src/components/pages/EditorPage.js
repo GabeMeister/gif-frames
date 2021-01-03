@@ -236,19 +236,21 @@ export default function EditorPage() {
               }
             </div >
             {!!framesModel.length ? (
-              <div className="relative mt-3 mb-3">
+              <div className="relative mt-6 mb-6">
                 <ImageLayer
                   key={`img-${framesModel[frameIdx].getHash()}`}
                   imageLayerModel={framesModel[frameIdx].imageLayerModel}
                 />
-                <TextLayer
-                  // We want to re-render the text layer when we (1) add some new
-                  // text, (2) change the font size or (3) adjust the frame index
-                  // when NOT autoplaying
-                  key={`${textLayerModelRef.current.textList.length}-${textLayerModelRef.current.fontSize}-${!autoplaying ? frameIdx : ''}`}
-                  textLayerModel={textLayerModelRef.current}
-                  onTextMove={onTextMove}
-                />
+                <div className="absolute top-0 left-0 w-full">
+                  <TextLayer
+                    // We want to re-render the text layer when we (1) add some new
+                    // text, (2) change the font size or (3) adjust the frame index
+                    // when NOT autoplaying
+                    key={`${textLayerModelRef.current.textList.length}-${textLayerModelRef.current.fontSize}-${!autoplaying ? frameIdx : ''}`}
+                    textLayerModel={textLayerModelRef.current}
+                    onTextMove={onTextMove}
+                  />
+                </div>
                 <div className="flex justify-center items-center mt-3">
                   <div className="arrow-left" onClick={() => onFrameIdxChange(frameIdx - 1)}></div>
                   <h1 className="mr-3 ml-3">{frameIdx + 1} / {framesModel.length}</h1>

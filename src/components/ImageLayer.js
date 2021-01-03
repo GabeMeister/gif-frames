@@ -5,7 +5,7 @@ export default function ImageLayer({ imageLayerModel }) {
     <img
       src={imageLayerModel.dataUrl}
       alt={`frame-thumbnail`}
-      className="js-frame-img select-none"
+      className="js-frame-img select-none m-auto"
     />
   );
 };
