@@ -101,7 +101,7 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { } }) {
   }
 
   return (
-    <>
+    <div className="absolute top-0 left-0">
       <canvas
         id={textLayerData.getHash()}
         ref={canvasRef}
@@ -110,8 +110,8 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { } }) {
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseMove={onMouseMove}
-        className="frame-canvas absolute"
+        className="js-frame-canvas absolute"
       />
-    </>
+    </div>
   );
 };

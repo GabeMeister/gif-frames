@@ -6,6 +6,7 @@ import {
   Route
 } from 'react-router-dom';
 
+import './reset.css';
 import './App.css';
 import EditorPage from './components/pages/EditorPage';
 import HomePage from './components/pages/HomePage';

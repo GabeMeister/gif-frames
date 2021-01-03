@@ -12,8 +12,8 @@ export default function GifRenderer({ framesModel, onFinish, delay, fontSize = 3
     });
 
     // iterate through all canvases and images
-    const frameImages = document.querySelectorAll('.gif-renderer .frame-img');
-    const frameCanvases = document.querySelectorAll('.gif-renderer .frame-canvas');
+    const frameImages = document.querySelectorAll('.gif-renderer .js-frame-img');
+    const frameCanvases = document.querySelectorAll('.gif-renderer .js-frame-canvas');
 
     for (let i = 0; i < frameCanvases.length; i++) {
 
