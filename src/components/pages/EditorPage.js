@@ -18,14 +18,14 @@ function useQuery() {
 
 export default function EditorPage() {
   let query = useQuery();
-  const [delay, setDelay] = useState(200);
+  const [delay, setDelay] = useState(100);
   const [framesModel, setFramesModel] = useState([]);
   const [frameIdx, setFrameIdx] = useState(0);
   const [fontSize, setFontSize] = useState(32);
   const [rendering, setRendering] = useState(false);
   const [autoplaying, setAutoplaying] = useState(false);
   const [autoplayCounter, setAutoplayCounter] = useState(3);
-  const [autoplayDelay, setAutoplayDelay] = useState(200);
+  const [autoplayDelay, setAutoplayDelay] = useState(50);
   const textRef = useRef(null);
   const delayRef = useRef(null);
   const autoplayRef = useRef(null);
@@ -269,7 +269,7 @@ export default function EditorPage() {
               <button
                 onClick={() => onAddTextClick()}
                 className="bg-blue-300 p-2.5 rounded flex-none"
-              >Add Text</button>
+              >Add</button>
             </div>
             <div className="mt-3">
               <div className="text-2xl inline-block w-60 flex-none">Font Size:</div>
