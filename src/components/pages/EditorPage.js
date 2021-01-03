@@ -145,14 +145,14 @@ export default function EditorPage() {
     return () => clearInterval(id);
   }, [autoplaying, autoplayCounter, onFrameSubmit, frameIdx, framesModel.length, autoplayDelay]);
 
-  function getAutoplayCounterText(counter) {
-    if (counter === 0) {
-      return 'Go!';
-    }
-    else {
-      return counter;
-    }
-  }
+  // function getAutoplayCounterText(counter) {
+  //   if (counter === 0) {
+  //     return 'Go!';
+  //   }
+  //   else {
+  //     return counter;
+  //   }
+  // }
 
   function onAddTextClick() {
     const newText = textRef.current.value;
@@ -211,7 +211,7 @@ export default function EditorPage() {
                 </button>
             </Link>
           </div>
-          <div className="p-6">
+          <div className="p-6" style={{ minWidth: '500px' }}>
             <div className="flex items-center justify-between">
               {!!framesModel.length && (
                 <>
@@ -226,7 +226,6 @@ export default function EditorPage() {
                       />
                       <div className="inline-block ml-1">{autoplaying ? 'Pause Auto-play' : 'Begin Auto-play'}</div>
                     </button>
-                    <h1 className="text-lg ml-3 inline">{autoplaying ? getAutoplayCounterText(autoplayCounter) : ''}</h1>
                   </div>
                   <button
                     onClick={() => onFrameSubmit()}
