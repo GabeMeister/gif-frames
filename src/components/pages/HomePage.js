@@ -45,7 +45,7 @@ export default function HomePage() {
               type="text"
               value={gifUrl}
               onChange={() => setGifUrl(gifUrlRef.current.value)}
-              className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3 mt-3"
+              className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3 mt-3 w-1/3"
             />{' '}
             <button
               onClick={onUrlEntered}
