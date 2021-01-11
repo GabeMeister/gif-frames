@@ -53,7 +53,7 @@ export default function HomePage() {
             >
               {fetchLoading
                 ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
-                : <span>Enter</span>
+                : <span>Go</span>
               }
             </button>
           </div>

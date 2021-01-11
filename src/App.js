@@ -15,7 +15,7 @@ window.$ = $;
 
 function App() {
   return (
-    <div className="font-sans">
+    <div>
       <Router>
         <div>
           <Switch>
