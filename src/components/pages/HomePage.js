@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Redirect
 } from 'react-router-dom';
+import GifSearcher from '../GifSearcher';
+import RadioTab from '../RadioTab';
 
 export default function HomePage() {
   const [gifUrl, setGifUrl] = useState('');
@@ -38,24 +40,47 @@ export default function HomePage() {
       {redirecting ? (
         <Redirect to={`/editor?gifUrl=${gifUrl}`} />
       ) : (
-          <div className="p-6 text-center">
-            <h1 className="text-2xl">Enter gif url:</h1>
-            <input
-              ref={gifUrlRef}
-              type="text"
-              value={gifUrl}
-              onChange={() => setGifUrl(gifUrlRef.current.value)}
-              className="pt-2 pb-2 border-b-2 outline-none focus:border-blue-300 mr-3 mt-3 w-1/3"
-            />{' '}
-            <button
-              onClick={onUrlEntered}
-              className={`${fetchLoading ? 'disabled:opacity-50 bg-gray-300' : 'bg-blue-300'} p-2.5 rounded`}
-            >
-              {fetchLoading
-                ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
-                : <span>Go</span>
+          <div className="p-6 w-1/2 mr-auto ml-auto">
+            <RadioTab options={[
+              {
+                name: 'search',
+                displayName: 'Search',
+                content: (
+                  <GifSearcher />
+                )
+              },
+              {
+                name: 'url',
+                displayName: 'Url',
+                content: (
+                  <>
+                    <input
+                      ref={gifUrlRef}
+                      type="text"
+                      value={gifUrl}
+                      onChange={() => setGifUrl(gifUrlRef.current.value)}
+                      className="pb-2 border-b-2 outline-none focus:border-blue-300 mr-3 w-1/3"
+                    />{' '}
+                    <button
+                      onClick={onUrlEntered}
+                      className={`${fetchLoading ? 'disabled:opacity-50 bg-gray-300' : 'bg-blue-300'} p-2.5 rounded`}
+                    >
+                      {fetchLoading
+                        ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
+                        : <span>Go</span>
+                      }
+                    </button>
+                  </>
+                )
+              },
+              {
+                name: 'file',
+                displayName: 'File Upload',
+                content: (
+                  <div>This is the file upload tab</div>
+                )
               }
-            </button>
+            ]} />
           </div>
         )}
     </>
