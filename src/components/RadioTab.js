@@ -7,17 +7,17 @@ export default function RadioTab({ options }) {
     <div>
       {options.map(option => {
         return (
-          <div className="inline mr-4">
+          <div className="inline mr-4" key={option.name}>
             <input
               type="radio"
               name="gif_input_method"
               value={option.name}
               className="mr-1 cursor-pointer"
               checked={method === option.name}
-              onClick={() => setMethod(option.name)}
+              onChange={() => setMethod(option.name)}
             />
             <label
-              for="gif_input_method"
+              htmlFor="gif_input_method"
               onClick={() => setMethod(option.name)}
               className="cursor-pointer"
             >{option.displayName}</label>

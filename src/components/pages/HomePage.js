@@ -35,6 +35,11 @@ export default function HomePage() {
     }, 300);
   }
 
+  function onSearchComplete(url) {
+    setGifUrl(url);
+    setRedirecting(true);
+  }
+
   return (
     <>
       {redirecting ? (
@@ -46,7 +51,7 @@ export default function HomePage() {
                 name: 'search',
                 displayName: 'Search',
                 content: (
-                  <GifSearcher />
+                  <GifSearcher onGifSelected={url => onSearchComplete(url)} />
                 )
               },
               {
@@ -71,13 +76,6 @@ export default function HomePage() {
                       }
                     </button>
                   </>
-                )
-              },
-              {
-                name: 'file',
-                displayName: 'File Upload',
-                content: (
-                  <div>This is the file upload tab</div>
                 )
               }
             ]} />

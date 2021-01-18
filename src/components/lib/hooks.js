@@ -3,7 +3,7 @@ import getGiphyGifs from './giphy';
 
 export const useGifSearch = ({ text }) => {
   const [results, setResults] = useState([]);
-  const [error, setError] = useState([]);
+  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -28,5 +28,5 @@ export const useGifSearch = ({ text }) => {
     }
   }, [text]);
 
-  return [results, loading, error];
+  return [results.slice(0, 20), loading, error];
 };
