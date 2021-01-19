@@ -252,9 +252,21 @@ export default function EditorPage() {
                   />
                 </div>
                 <div className="flex justify-center items-center mt-3">
+                  <img
+                    className="w-8 mr-3 cursor-pointer"
+                    src="double-arrow-left.png"
+                    alt="double-arrow-left"
+                    onClick={() => onFrameIdxChange(0)}
+                  />
                   <div className="arrow-left" onClick={() => onFrameIdxChange(frameIdx - 1)}></div>
                   <h1 className="mr-3 ml-3">{frameIdx + 1} / {framesModel.length}</h1>
                   <div className="arrow-right" onClick={() => onFrameIdxChange(frameIdx + 1)}></div>
+                  <img
+                    className="w-8 ml-3 cursor-pointer"
+                    src="double-arrow-right.png"
+                    alt="double-arrow-left"
+                    onClick={() => onFrameIdxChange(framesModel.length - 1)}
+                  />
                 </div>
               </div>
             ) : (
