@@ -184,7 +184,6 @@ export default function EditorPage() {
   }
 
   function onFontSizeChange() {
-    console.log('here', fontSizeRef.current.value);
     if (parseInt(fontSizeRef.current.value)) {
       setFontSize(parseInt(fontSizeRef.current.value));
     }
