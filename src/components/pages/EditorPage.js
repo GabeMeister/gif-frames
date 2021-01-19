@@ -25,14 +25,13 @@ export default function EditorPage() {
   const [rendering, setRendering] = useState(false);
   const [autoplaying, setAutoplaying] = useState(false);
   const [autoplayCounter, setAutoplayCounter] = useState(3);
-  const [autoplayDelay, setAutoplayDelay] = useState(50);
   const textRef = useRef(null);
   const delayRef = useRef(null);
-  const autoplayRef = useRef(null);
   const fontSizeRef = useRef(null);
   const textLayerModelRef = useRef(null);
   const [_, forceUpdate] = useReducer(x => x + 1, 0); // eslint-disable-line no-unused-vars
   const gifUrl = query.get('gifUrl');
+  const autoplayDelay = 1;
 
   const renderCurrentFrame = useCallback(() => {
     let framesModelCopy = cloneDeep(framesModel);
@@ -145,15 +144,6 @@ export default function EditorPage() {
     return () => clearInterval(id);
   }, [autoplaying, autoplayCounter, onFrameSubmit, frameIdx, framesModel.length, autoplayDelay]);
 
-  // function getAutoplayCounterText(counter) {
-  //   if (counter === 0) {
-  //     return 'Go!';
-  //   }
-  //   else {
-  //     return counter;
-  //   }
-  // }
-
   function onAddTextClick() {
     const newText = textRef.current.value;
     const textLayerModelCopy = cloneDeep(textLayerModelRef.current);
@@ -224,7 +214,7 @@ export default function EditorPage() {
                         alt="play"
                         src={`${autoplaying ? 'pause.png' : 'play.png'}`} className="w-4 inline"
                       />
-                      <div className="inline-block ml-1">{autoplaying ? 'Pause Auto-play' : 'Begin Auto-play'}</div>
+                      <div className="inline-block ml-1">{autoplaying ? 'Pause' : 'Play'}</div>
                     </button>
                   </div>
                   <button
@@ -295,16 +285,6 @@ export default function EditorPage() {
               />
               <span className="text-2xl">px</span>
             </div>
-            <div className="text-2xl mt-3 inline-block w-60 flex-none">Auto-play Speed:</div>
-            <input
-              ref={autoplayRef}
-              type="number"
-              value={autoplayDelay}
-              onChange={() => setAutoplayDelay(parseInt(autoplayRef.current.value))}
-              className="pl-3 border-b-2 outline-none focus:border-blue-300 w-24 text-2xl ml-3 mr-3 text-center"
-            />
-            <span className="text-2xl mt-3">ms</span>
-            <br />
             <div className="text-2xl mt-3 inline-block w-60 flex-none">Final Gif Speed:</div>
             <input
               ref={delayRef}
