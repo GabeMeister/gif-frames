@@ -3,6 +3,7 @@ import {
   Redirect
 } from 'react-router-dom';
 import GifSearcher from '../GifSearcher';
+import GifUploader from '../GifUploader';
 import RadioTab from '../RadioTab';
 
 export default function HomePage() {
@@ -40,12 +41,18 @@ export default function HomePage() {
     setRedirecting(true);
   }
 
+  function onGifUploaded(file) {
+    setGifUrl(URL.createObjectURL(file));
+    setRedirecting(true);
+  }
+
   return (
     <>
       {redirecting ? (
         <Redirect to={`/editor?gifUrl=${gifUrl}`} />
       ) : (
-          <div className="p-6 w-1/2 mr-auto ml-auto">
+          <div className="p-6 w-1/2 mr-auto ml-auto text-center">
+            <h1 className="text-9xl mt-3 mb-10 headline">Text Gif</h1>
             <RadioTab options={[
               {
                 name: 'search',
@@ -64,11 +71,11 @@ export default function HomePage() {
                       type="text"
                       value={gifUrl}
                       onChange={() => setGifUrl(gifUrlRef.current.value)}
-                      className="pb-2 border-b-2 outline-none focus:border-blue-300 mr-3 w-1/3"
+                      className="pb-2 border-b-2 outline-none focus:border-blue-300 mx-auto w-1/3"
                     />{' '}
                     <button
                       onClick={onUrlEntered}
-                      className={`${fetchLoading ? 'disabled:opacity-50 bg-gray-300' : 'bg-blue-300'} p-2.5 rounded`}
+                      className={`${fetchLoading ? 'disabled:opacity-50 bg-gray-300' : 'bg-blue-300'} ml-3 p-2.5 rounded`}
                     >
                       {fetchLoading
                         ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
@@ -76,6 +83,13 @@ export default function HomePage() {
                       }
                     </button>
                   </>
+                )
+              },
+              {
+                name: 'file',
+                displayName: 'File',
+                content: (
+                  <GifUploader onGifUploaded={file => onGifUploaded(file)} />
                 )
               }
             ]} />

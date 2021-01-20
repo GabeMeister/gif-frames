@@ -11,18 +11,16 @@ export default function GifSearcher({ onGifSelected }) {
 
   return (
     <div>
-      <div className="flex justify-between">
+      <div className="">
         <input
           ref={searchWordRef}
           type="text"
           value={searchWord}
           onChange={() => setSearchWord(searchWordRef.current.value)}
           placeholder="Search for a gif..."
-          className="pb-2 border-b-2 outline-none focus:border-blue-300 mr-3 w-1/3"
+          className="mx-auto pb-2 border-b-2 outline-none focus:border-blue-300 w-1/2"
         />
-        {selectedGif !== null && (
-          <button className="p-2 rounded bg-green-400" onClick={() => onGifSelected(selectedGif.url)}>Next →</button>
-        )}
+        <button className={`${selectedGif !== null ? '' : 'invisible'} ml-3 p-2 rounded bg-green-400`} onClick={() => onGifSelected(selectedGif.url)}>Next →</button>
       </div>
       {gifsLoading && (
         <div className="text-center	mt-3">Loading...</div>
@@ -42,7 +40,7 @@ export default function GifSearcher({ onGifSelected }) {
                 onMouseLeave={() => setHoveredGifId('')}
                 className={`m-3 w-48 inline-block cursor-pointer ${selectedGif !== null && gif.id === selectedGif.id ? 'border-green-400 border-solid border-8 rounded' : ''}`}
                 onClick={() => {
-                  setSelectedGif(gif)
+                  setSelectedGif(gif);
                 }}
               />
             ))
