@@ -43,8 +43,7 @@ export default function GifRenderer({ framesModel, onFinish, delay, fontSize = 3
     }
 
     gif.on('finished', function (blob) {
-      window.open(URL.createObjectURL(blob));
-      onFinish();
+      onFinish(URL.createObjectURL(blob));
     });
 
     gif.render();

@@ -179,8 +179,16 @@ export default function EditorPage() {
     setRendering(true);
   }
 
-  function onRenderFinish() {
+  function onRenderFinish(url) {
     setRendering(false);
+
+    // Create "hidden" link, click it to download the gif, then remove the link
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'finished.gif');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   function onFontSizeChange() {
@@ -300,14 +308,14 @@ export default function EditorPage() {
             >
               {rendering
                 ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
-                : <span>Finish</span>
+                : <span>Download</span>
               }
             </button>
           </div >
           { rendering && (
             <GifRenderer
               framesModel={framesModel}
-              onFinish={onRenderFinish}
+              onFinish={url => onRenderFinish(url)}
               delay={delay}
               fontSize={fontSize}
             />
