@@ -9,6 +9,7 @@ import gifFrames from 'gif-frames';
 import ImageLayer from '../ImageLayer';
 import TextLayer from '../TextLayer';
 import GifRenderer from '../GifRenderer';
+import PreviewModal from '../Modal';
 import FrameModel from '../../models/FrameModel';
 import TextLayerModel from '../../models/TextLayerModel';
 
@@ -23,7 +24,10 @@ export default function EditorPage() {
   const [frameIdx, setFrameIdx] = useState(0);
   const [fontSize, setFontSize] = useState(32);
   const [rendering, setRendering] = useState(false);
+  const [previewRendering, setPreviewRendering] = useState(false);
   const [autoplaying, setAutoplaying] = useState(false);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
   const [autoplayCounter, setAutoplayCounter] = useState(3);
   const textRef = useRef(null);
   const delayRef = useRef(null);
@@ -179,6 +183,19 @@ export default function EditorPage() {
     setRendering(true);
   }
 
+  function onPreviewRenderClick() {
+    // Make sure we render the current frame we are on (typically the last one)
+    renderCurrentFrame();
+
+    setPreviewRendering(true);
+  }
+
+  function onPreviewRenderFinish(url) {
+    setPreviewRendering(false);
+    setPreviewUrl(url);
+    setPreviewModalOpen(true);
+  }
+
   function onRenderFinish(url) {
     setRendering(false);
 
@@ -195,6 +212,10 @@ export default function EditorPage() {
     if (parseInt(fontSizeRef.current.value)) {
       setFontSize(parseInt(fontSizeRef.current.value));
     }
+  }
+
+  function onPreviewClose() {
+    setPreviewModalOpen(false);
   }
 
   return (
@@ -302,20 +323,44 @@ export default function EditorPage() {
             />
             <span className="text-2xl mt-3">ms</span>
             <br />
-            <button
-              onClick={() => onRenderClick()}
-              className={`${rendering ? 'bg-gray-500' : 'bg-green-500'} p-4 text-2xl rounded mt-6 block m-auto w-40`}
-            >
-              {rendering
-                ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
-                : <span>Download</span>
-              }
-            </button>
-          </div >
+            <div className="flex">
+              <button
+                onClick={() => onPreviewRenderClick()}
+                className={`bg-gray-200 p-4 text-xl rounded mt-6 block m-auto w-40`}
+              >
+                {previewRendering
+                  ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
+                  : <span>Preview</span>
+                }
+              </button>
+              <button
+                onClick={() => onRenderClick()}
+                className={`${rendering ? 'bg-gray-500' : 'bg-green-500'} p-4 text-xl rounded mt-6 block m-auto w-40`}
+              >
+                {rendering
+                  ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
+                  : <span>Download</span>
+                }
+              </button>
+            </div>
+          </div>
+          { previewModalOpen && (
+            <PreviewModal onClose={onPreviewClose}>
+              <img className="mx-auto" src={previewUrl} alt="preview-gif" />
+            </PreviewModal>
+          )}
           { rendering && (
             <GifRenderer
               framesModel={framesModel}
               onFinish={url => onRenderFinish(url)}
+              delay={delay}
+              fontSize={fontSize}
+            />
+          )}
+          { previewRendering && (
+            <GifRenderer
+              framesModel={framesModel}
+              onFinish={url => onPreviewRenderFinish(url)}
               delay={delay}
               fontSize={fontSize}
             />

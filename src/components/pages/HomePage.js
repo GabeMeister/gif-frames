@@ -51,8 +51,8 @@ export default function HomePage() {
       {redirecting ? (
         <Redirect to={`/editor?gifUrl=${gifUrl}`} />
       ) : (
-          <div className="p-6 w-1/2 mr-auto ml-auto text-center">
-            <h1 className="text-9xl mt-3 mb-10 headline">Text Gif</h1>
+          <div className="p-6 w-2/3 mr-auto ml-auto text-center">
+            <h1 className="text-8xl mt-3 mb-10 headline">Text Gif</h1>
             <RadioTab options={[
               {
                 name: 'search',
