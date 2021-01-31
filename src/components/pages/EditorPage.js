@@ -29,6 +29,7 @@ export default function EditorPage() {
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
   const [autoplayCounter, setAutoplayCounter] = useState(3);
+  const editorRef = useRef(null);
   const textRef = useRef(null);
   const delayRef = useRef(null);
   const fontSizeRef = useRef(null);
@@ -54,6 +55,11 @@ export default function EditorPage() {
 
     setFrameIdx(frameIdx + 1);
   }, [framesModel, frameIdx, renderCurrentFrame]);
+
+  useEffect(() => {
+    // Have to focus the editor when it loads so the keydown press works
+    editorRef.current.focus();
+  }, []);
 
   useEffect(() => {
     // If we don't have a gif url don't do anything, we're about to redirect
@@ -85,27 +91,6 @@ export default function EditorPage() {
       setFramesModel(frameData);
     });
   }, [gifUrl]);
-
-  useEffect(() => {
-    function logKey(e) {
-      // Setup global hotkey for creating a new frame
-      if (e.code === 'Enter') {
-        e.preventDefault();
-        onFrameSubmit();
-      }
-
-      // Setup global hotkey for beginning autoplay
-      if (e.code === 'Space') {
-        e.preventDefault();
-        setAutoplaying(!autoplaying);
-      }
-    }
-    document.addEventListener('keydown', logKey);
-
-    return () => {
-      document.removeEventListener('keydown', logKey);
-    };
-  }, [framesModel, onFrameSubmit, autoplaying]);
 
   useEffect(() => {
     if (framesModel.length) {
@@ -147,6 +132,20 @@ export default function EditorPage() {
 
     return () => clearInterval(id);
   }, [autoplaying, autoplayCounter, onFrameSubmit, frameIdx, framesModel.length, autoplayDelay]);
+
+  function logKey(e) {
+    // Setup global hotkey for creating a new frame
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      onFrameSubmit();
+    }
+
+    // Setup global hotkey for beginning autoplay
+    if (e.keyCode === 32) {
+      e.preventDefault();
+      setAutoplaying(!autoplaying);
+    }
+  }
 
   function onAddTextClick() {
     const newText = textRef.current.value;
@@ -219,7 +218,13 @@ export default function EditorPage() {
   }
 
   return (
-    <>
+    <div
+      id="editor"
+      ref={editorRef}
+      tabIndex="0"
+      className="h-screen outline-none"
+      onKeyDown={logKey}
+    >
       {gifUrl ? (
         <div className="flex justify-center mt-16">
           <div className="absolute top-3 left-3">
@@ -370,6 +375,6 @@ export default function EditorPage() {
           <Redirect to="/" />
         )
       }
-    </>
+    </div>
   );
 }
