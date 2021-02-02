@@ -38,7 +38,7 @@ export default function GifRenderer({ framesModel, onFinish, delay, fontSize = 3
 
       // Add the final frame
       gif.addFrame(final, {
-        delay
+        delay: delay * 7
       });
     }
 

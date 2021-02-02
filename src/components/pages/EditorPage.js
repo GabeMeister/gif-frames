@@ -20,12 +20,14 @@ function useQuery() {
 export default function EditorPage() {
   let query = useQuery();
   const [delay, setDelay] = useState(100);
+  const [autoplayDelay, setAutoplayDelay] = useState(delay);
   const [framesModel, setFramesModel] = useState([]);
   const [frameIdx, setFrameIdx] = useState(0);
   const [fontSize, setFontSize] = useState(32);
   const [rendering, setRendering] = useState(false);
   const [previewRendering, setPreviewRendering] = useState(false);
   const [autoplaying, setAutoplaying] = useState(false);
+  const [isTextLayerLocked, setIsTextLayerLocked] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
   const [autoplayCounter, setAutoplayCounter] = useState(3);
@@ -36,9 +38,9 @@ export default function EditorPage() {
   const textLayerModelRef = useRef(null);
   const [_, forceUpdate] = useReducer(x => x + 1, 0); // eslint-disable-line no-unused-vars
   const gifUrl = query.get('gifUrl');
-  const autoplayDelay = 1;
 
   const renderCurrentFrame = useCallback(() => {
+    console.log('renderCurrentFrame');
     let framesModelCopy = cloneDeep(framesModel);
     framesModelCopy[frameIdx].textLayerModel = cloneDeep(textLayerModelRef.current);
 
@@ -60,6 +62,10 @@ export default function EditorPage() {
     // Have to focus the editor when it loads so the keydown press works
     editorRef.current.focus();
   }, []);
+
+  useEffect(() => {
+    setAutoplayDelay(delay);
+  }, [delay, setAutoplayDelay]);
 
   useEffect(() => {
     // If we don't have a gif url don't do anything, we're about to redirect
@@ -126,6 +132,7 @@ export default function EditorPage() {
         else if (frameChanging && frameIdx === framesModel.length - 1) {
           clearInterval(id);
           setAutoplaying(a => !a);
+          setLocked(false);
         }
       }, autoplayDelay);
     }
@@ -133,7 +140,7 @@ export default function EditorPage() {
     return () => clearInterval(id);
   }, [autoplaying, autoplayCounter, onFrameSubmit, frameIdx, framesModel.length, autoplayDelay]);
 
-  function logKey(e) {
+  function onKeyDown(e) {
     // Setup global hotkey for creating a new frame
     if (e.keyCode === 13) {
       e.preventDefault();
@@ -152,7 +159,7 @@ export default function EditorPage() {
     const textLayerModelCopy = cloneDeep(textLayerModelRef.current);
 
     textLayerModelCopy.addText(newText);
-    textLayerModelRef.current = cloneDeep(textLayerModelCopy);
+    textLayerModelRef.current = textLayerModelCopy;
 
     textRef.current.value = '';
 
@@ -173,6 +180,10 @@ export default function EditorPage() {
 
   function onTextMove({ textLayerData }) {
     textLayerModelRef.current = textLayerData;
+  }
+
+  function setLocked(isLocked) {
+    setIsTextLayerLocked(isLocked);
   }
 
   function onRenderClick() {
@@ -223,7 +234,7 @@ export default function EditorPage() {
       ref={editorRef}
       tabIndex="0"
       className="h-screen outline-none"
-      onKeyDown={logKey}
+      onKeyDown={onKeyDown}
     >
       {gifUrl ? (
         <div className="flex justify-center mt-16">
@@ -257,7 +268,7 @@ export default function EditorPage() {
                 </>
               )
               }
-            </div >
+            </div>
             {!!framesModel.length ? (
               <div className="relative mt-6 mb-6">
                 <ImageLayer
@@ -269,9 +280,12 @@ export default function EditorPage() {
                     // We want to re-render the text layer when we (1) add some new
                     // text, (2) change the font size or (3) adjust the frame index
                     // when NOT autoplaying
-                    key={`${textLayerModelRef.current.textList.length}-${textLayerModelRef.current.fontSize}-${!autoplaying ? frameIdx : ''}`}
+                    // key={``}
+                    // key={`${textLayerModelRef.current.textList.length}-${textLayerModelRef.current.fontSize}`}
+                    key={isTextLayerLocked ? 'locked' : `${textLayerModelRef.current.textList.length}-${textLayerModelRef.current.fontSize}-${!autoplaying ? frameIdx : ''}`}
                     textLayerModel={textLayerModelRef.current}
                     onTextMove={onTextMove}
+                    setLocked={setLocked}
                   />
                 </div>
                 <div className="flex justify-center items-center mt-3">
@@ -295,38 +309,40 @@ export default function EditorPage() {
             ) : (
                 <img alt="loading-spinner" src="spinner.gif" className="ml-auto mr-auto mt-20 mb-20" />
               )}
-            <div className="flex">
-              <div className="text-2xl inline-block flex-none">Add Text:</div>
+            <div className="">
+              <div className="flex">
+                <div className="text-2xl inline-block flex-none">Add Text:</div>
+                <input
+                  ref={textRef}
+                  type="text"
+                  className="pl-1 p-0.5 border-b-2 outline-none focus:border-blue-300 mr-3 ml-3 text-2xl"
+                />
+                <button
+                  onClick={() => onAddTextClick()}
+                  className="bg-blue-300 p-2.5 rounded flex-none"
+                >Add</button>
+              </div>
+              <div className="mt-3">
+                <div className="text-2xl inline-block w-60 flex-none">Font Size:</div>
+                <input
+                  ref={fontSizeRef}
+                  type="number"
+                  value={fontSize}
+                  onChange={onFontSizeChange}
+                  className="pl-3 border-b-2 outline-none focus:border-blue-300 flex-none mr-3 ml-3 w-24 text-2xl text-center"
+                />
+                <span className="text-2xl">px</span>
+              </div>
+              <div className="text-2xl mt-3 inline-block w-60 flex-none">Final Gif Speed:</div>
               <input
-                ref={textRef}
-                type="text"
-                className="pl-1 p-0.5 border-b-2 outline-none focus:border-blue-300 mr-3 ml-3 text-2xl"
-              />
-              <button
-                onClick={() => onAddTextClick()}
-                className="bg-blue-300 p-2.5 rounded flex-none"
-              >Add</button>
-            </div>
-            <div className="mt-3">
-              <div className="text-2xl inline-block w-60 flex-none">Font Size:</div>
-              <input
-                ref={fontSizeRef}
+                ref={delayRef}
                 type="number"
-                value={fontSize}
-                onChange={onFontSizeChange}
-                className="pl-3 border-b-2 outline-none focus:border-blue-300 flex-none mr-3 ml-3 w-24 text-2xl text-center"
+                value={delay}
+                onChange={() => setDelay(parseInt(delayRef.current.value))}
+                className="pl-3 border-b-2 text-2xl outline-none focus:border-blue-300 ml-3 mr-3 w-24 text-center"
               />
-              <span className="text-2xl">px</span>
+              <span className="text-2xl mt-3">ms</span>
             </div>
-            <div className="text-2xl mt-3 inline-block w-60 flex-none">Final Gif Speed:</div>
-            <input
-              ref={delayRef}
-              type="number"
-              value={delay}
-              onChange={() => setDelay(parseInt(delayRef.current.value))}
-              className="pl-3 border-b-2 text-2xl outline-none focus:border-blue-300 ml-3 mr-3 w-24 text-center"
-            />
-            <span className="text-2xl mt-3">ms</span>
             <br />
             <div className="flex">
               <button
