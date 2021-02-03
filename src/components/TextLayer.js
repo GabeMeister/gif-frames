@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import cloneDeep from 'lodash.clonedeep';
 
-export default function TextLayer({ textLayerModel, onTextMove = () => { }, setLocked = () => { } }) {
+export default function TextLayer({ textLayerModel, onTextMove = () => { }, isLocked }) {
   const canvasRef = useRef(null);
   const [mouseDown, setMouseDown] = useState(false);
-  const [isTextSelected, setIsTextSelected] = useState(false);
   const [layerData, setLayerData] = useState(textLayerModel);
   const [coord, setCoord] = useState({ x: -1, y: -1 });
   const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
@@ -34,7 +33,7 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { }, setL
       if (index === selectedTextIndex) {
         // Draw a border
         ctx.beginPath();
-        ctx.lineWidth = "4";
+        ctx.lineWidth = "1";
         ctx.rect(text.x - 5, text.y - text.height, text.width + 10, text.height + 10);
         ctx.stroke();
       }
@@ -52,28 +51,17 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { }, setL
     );
   }
 
-  function onClick(e) {
-    // Check if the user clicked a piece of text, set state if 
-    const pos = getMousePos(canvasRef.current, e);
-
-    const index = canvasTextList.findIndex(text => isTextClicked(text, pos.x, pos.y));
-    if (index >= 0) {
-      setIsTextSelected(true);
-      setSelectedTextIndex(index);
-      setLocked(true);
-    }
-    else {
-      setIsTextSelected(false);
-      setLocked(false);
-    }
-  }
-
   function onMouseDown(e) {
+    if (!isLocked) {
+      return;
+    }
+
     setMouseDown(true);
 
     const pos = getMousePos(canvasRef.current, e);
     const index = canvasTextList.findIndex(text => isTextClicked(text, pos.x, pos.y));
-    if (index >= 0 && isTextSelected && selectedTextIndex === index) {
+    if (index >= 0) {
+      setSelectedTextIndex(index);
       setCoord({
         x: pos.x,
         y: pos.y
@@ -116,15 +104,13 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { }, setL
 
     const index = canvasTextList.findIndex(text => isTextClicked(text, pos.x, pos.y));
     if (index >= 0) {
-      // We for sure need to change the cursor look like the text is selectable
-      if (isTextSelected && mouseDown) {
-        canvasRef.current.style.cursor = 'grabbing';
-      }
-      else if (isTextSelected) {
-        canvasRef.current.style.cursor = 'grab';
-      }
-      else {
-        canvasRef.current.style.cursor = 'pointer';
+      if (isLocked) {
+        if (mouseDown) {
+          canvasRef.current.style.cursor = 'grabbing';
+        }
+        else {
+          canvasRef.current.style.cursor = 'grab';
+        }
       }
     }
     else {
@@ -149,7 +135,6 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { }, setL
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
-      onClick={onClick}
       className="js-frame-canvas m-auto"
     />
   );

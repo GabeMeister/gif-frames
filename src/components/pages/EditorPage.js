@@ -40,7 +40,6 @@ export default function EditorPage() {
   const gifUrl = query.get('gifUrl');
 
   const renderCurrentFrame = useCallback(() => {
-    console.log('renderCurrentFrame');
     let framesModelCopy = cloneDeep(framesModel);
     framesModelCopy[frameIdx].textLayerModel = cloneDeep(textLayerModelRef.current);
 
@@ -132,7 +131,7 @@ export default function EditorPage() {
         else if (frameChanging && frameIdx === framesModel.length - 1) {
           clearInterval(id);
           setAutoplaying(a => !a);
-          setLocked(false);
+          setIsTextLayerLocked(false);
         }
       }, autoplayDelay);
     }
@@ -142,14 +141,20 @@ export default function EditorPage() {
 
   function onKeyDown(e) {
     // Setup global hotkey for creating a new frame
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13 && e.target.nodeName === 'DIV') {
       e.preventDefault();
       onFrameSubmit();
     }
 
     // Setup global hotkey for beginning autoplay
-    if (e.keyCode === 32) {
+    // Make sure target was from a div because people sometimes still want to type spaces in inputs
+    if (e.keyCode === 32 && e.target.nodeName === 'DIV') {
       e.preventDefault();
+
+      // If we are at the end, automatically restart from the beginning
+      if (frameIdx === framesModel.length - 1) {
+        setFrameIdx(0);
+      }
       setAutoplaying(!autoplaying);
     }
   }
@@ -180,10 +185,6 @@ export default function EditorPage() {
 
   function onTextMove({ textLayerData }) {
     textLayerModelRef.current = textLayerData;
-  }
-
-  function setLocked(isLocked) {
-    setIsTextLayerLocked(isLocked);
   }
 
   function onRenderClick() {
@@ -251,7 +252,13 @@ export default function EditorPage() {
                 <>
                   <div>
                     <button
-                      onClick={() => setAutoplaying(!autoplaying)}
+                      onClick={() => {
+                        // If we are at the end, automatically restart from the beginning
+                        if (frameIdx === framesModel.length - 1) {
+                          setFrameIdx(0);
+                        }
+                        setAutoplaying(!autoplaying);
+                      }}
                       className={`${autoplaying ? 'bg-yellow-500' : 'bg-green-500'} p-2.5 rounded`}
                     >
                       <img
@@ -259,6 +266,14 @@ export default function EditorPage() {
                         src={`${autoplaying ? 'pause.png' : 'play.png'}`} className="w-4 inline"
                       />
                       <div className="inline-block ml-1">{autoplaying ? 'Pause' : 'Play'}</div>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsTextLayerLocked(!isTextLayerLocked);
+                      }}
+                      className={`${isTextLayerLocked ? 'bg-gray-400' : 'bg-blue-400'} p-3 rounded ml-3`}
+                    >
+                      <div className="inline-block">{isTextLayerLocked ? 'Stop Editing' : 'Edit'}</div>
                     </button>
                   </div>
                   <button
@@ -285,7 +300,7 @@ export default function EditorPage() {
                     key={isTextLayerLocked ? 'locked' : `${textLayerModelRef.current.textList.length}-${textLayerModelRef.current.fontSize}-${!autoplaying ? frameIdx : ''}`}
                     textLayerModel={textLayerModelRef.current}
                     onTextMove={onTextMove}
-                    setLocked={setLocked}
+                    isLocked={isTextLayerLocked}
                   />
                 </div>
                 <div className="flex justify-center items-center mt-3">
