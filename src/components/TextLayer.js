@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import cloneDeep from 'lodash.clonedeep';
 
-export default function TextLayer({ textLayerModel, onTextMove = () => { }, isLocked }) {
+export default function TextLayer({ textLayerModel, onTextMove = () => { }, isLocked, showWarning }) {
   const canvasRef = useRef(null);
   const [mouseDown, setMouseDown] = useState(false);
   const [layerData, setLayerData] = useState(textLayerModel);
@@ -53,9 +53,11 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { }, isLo
 
   function onMouseDown(e) {
     if (!isLocked) {
+      showWarning(true);
       return;
     }
 
+    showWarning(false);
     setMouseDown(true);
 
     const pos = getMousePos(canvasRef.current, e);

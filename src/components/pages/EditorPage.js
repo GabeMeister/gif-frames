@@ -29,6 +29,7 @@ export default function EditorPage() {
   const [autoplaying, setAutoplaying] = useState(false);
   const [isTextLayerLocked, setIsTextLayerLocked] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [isShowingWarning, setIsShowingWarning] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
   const [autoplayCounter, setAutoplayCounter] = useState(3);
   const editorRef = useRef(null);
@@ -168,6 +169,8 @@ export default function EditorPage() {
 
     textRef.current.value = '';
 
+    setIsTextLayerLocked(true);
+
     forceUpdate();
   }
 
@@ -185,6 +188,10 @@ export default function EditorPage() {
 
   function onTextMove({ textLayerData }) {
     textLayerModelRef.current = textLayerData;
+  }
+
+  function showWarning(show) {
+    setIsShowingWarning(show);
   }
 
   function onRenderClick() {
@@ -253,32 +260,34 @@ export default function EditorPage() {
                   <div>
                     <button
                       onClick={() => {
-                        // If we are at the end, automatically restart from the beginning
-                        if (frameIdx === framesModel.length - 1) {
-                          setFrameIdx(0);
-                        }
-                        setAutoplaying(!autoplaying);
-                      }}
-                      className={`${autoplaying ? 'bg-yellow-500' : 'bg-green-500'} p-2.5 rounded`}
-                    >
-                      <img
-                        alt="play"
-                        src={`${autoplaying ? 'pause.png' : 'play.png'}`} className="w-4 inline"
-                      />
-                      <div className="inline-block ml-1">{autoplaying ? 'Pause' : 'Play'}</div>
-                    </button>
-                    <button
-                      onClick={() => {
                         setIsTextLayerLocked(!isTextLayerLocked);
                       }}
-                      className={`${isTextLayerLocked ? 'bg-gray-400' : 'bg-blue-400'} p-3 rounded ml-3`}
+                      className={`${isTextLayerLocked ? 'bg-gray-200' : 'bg-yellow-400'} ${isShowingWarning ? 'wiggling' : ''} p-3 rounded ${!textLayerModelRef.current.textList.length ? 'invisible' : ''}`}
                     >
                       <div className="inline-block">{isTextLayerLocked ? 'Stop Editing' : 'Edit'}</div>
                     </button>
+                    {isTextLayerLocked && (
+                      <button
+                        onClick={() => {
+                          // If we are at the end, automatically restart from the beginning
+                          if (frameIdx === framesModel.length - 1) {
+                            setFrameIdx(0);
+                          }
+                          setAutoplaying(!autoplaying);
+                        }}
+                        className={`${autoplaying ? 'bg-yellow-500' : 'bg-green-500'} p-2.5 rounded ml-3`}
+                      >
+                        <img
+                          alt="play"
+                          src={`${autoplaying ? 'pause.png' : 'play.png'}`} className="w-4 inline"
+                        />
+                        <div className="inline-block ml-1">{autoplaying ? 'Pause' : 'Play'}</div>
+                      </button>
+                    )}
                   </div>
                   <button
                     onClick={() => onFrameSubmit()}
-                    className="bg-blue-300 p-2.5 rounded"
+                    className={`bg-blue-300 p-2.5 rounded ${!textLayerModelRef.current.textList.length ? 'invisible' : ''}`}
                   >Copy Text to Next Frame →</button>
                 </>
               )
@@ -295,90 +304,99 @@ export default function EditorPage() {
                     // We want to re-render the text layer when we (1) add some new
                     // text, (2) change the font size or (3) adjust the frame index
                     // when NOT autoplaying
-                    // key={``}
-                    // key={`${textLayerModelRef.current.textList.length}-${textLayerModelRef.current.fontSize}`}
                     key={isTextLayerLocked ? 'locked' : `${textLayerModelRef.current.textList.length}-${textLayerModelRef.current.fontSize}-${!autoplaying ? frameIdx : ''}`}
                     textLayerModel={textLayerModelRef.current}
                     onTextMove={onTextMove}
                     isLocked={isTextLayerLocked}
+                    showWarning={showWarning}
                   />
                 </div>
-                <div className="flex justify-center items-center mt-3">
-                  <img
-                    className="w-8 mr-3 cursor-pointer"
-                    src="double-arrow-left.png"
-                    alt="double-arrow-left"
-                    onClick={() => onFrameIdxChange(0)}
-                  />
-                  <div className="arrow-left" onClick={() => onFrameIdxChange(frameIdx - 1)}></div>
-                  <h1 className="mr-3 ml-3">{frameIdx + 1} / {framesModel.length}</h1>
-                  <div className="arrow-right" onClick={() => onFrameIdxChange(frameIdx + 1)}></div>
-                  <img
-                    className="w-8 ml-3 cursor-pointer"
-                    src="double-arrow-right.png"
-                    alt="double-arrow-left"
-                    onClick={() => onFrameIdxChange(framesModel.length - 1)}
-                  />
+                {!isTextLayerLocked && (
+                  <div className="flex justify-center items-center mt-3">
+                    <img
+                      className="w-8 mr-3 cursor-pointer"
+                      src="double-arrow-left.png"
+                      alt="double-arrow-left"
+                      onClick={() => onFrameIdxChange(0)}
+                    />
+                    <div className="arrow-left" onClick={() => onFrameIdxChange(frameIdx - 1)}></div>
+                    <h1 className="mr-3 ml-3">{frameIdx + 1} / {framesModel.length}</h1>
+                    <div className="arrow-right" onClick={() => onFrameIdxChange(frameIdx + 1)}></div>
+                    <img
+                      className="w-8 ml-3 cursor-pointer"
+                      src="double-arrow-right.png"
+                      alt="double-arrow-left"
+                      onClick={() => onFrameIdxChange(framesModel.length - 1)}
+                    />
+                  </div>
+                )}
+                {isTextLayerLocked && (
+                  <div className="flex justify-center items-center mt-3">
+                    <h1 className="mr-3 ml-3">{frameIdx + 1} / {framesModel.length}</h1>
+                  </div>
+                )}
+                {!isTextLayerLocked && (
+                  <>
+                    <div>
+                      <div className="flex mt-3">
+                        <div className="text-2xl inline-block flex-none">Add Text:</div>
+                        <input
+                          ref={textRef}
+                          type="text"
+                          className="pl-1 p-0.5 border-b-2 outline-none focus:border-blue-300 mr-3 ml-3 text-2xl"
+                        />
+                        <button
+                          onClick={() => onAddTextClick()}
+                          className="bg-blue-300 p-2.5 rounded flex-none"
+                        >Add</button>
+                      </div>
+                      <div className="mt-3">
+                        <div className="text-2xl inline-block w-60 flex-none">Font Size:</div>
+                        <input
+                          ref={fontSizeRef}
+                          type="number"
+                          value={fontSize}
+                          onChange={onFontSizeChange}
+                          className="pl-3 border-b-2 outline-none focus:border-blue-300 flex-none mr-3 ml-3 w-24 text-2xl text-center"
+                        />
+                        <span className="text-2xl">px</span>
+                      </div>
+                      <div className="text-2xl mt-3 inline-block w-60 flex-none">Final Gif Speed:</div>
+                      <input
+                        ref={delayRef}
+                        type="number"
+                        value={delay}
+                        onChange={() => setDelay(parseInt(delayRef.current.value))}
+                        className="pl-3 border-b-2 text-2xl outline-none focus:border-blue-300 ml-3 mr-3 w-24 text-center"
+                      />
+                      <span className="text-2xl mt-3">ms</span>
+                    </div>
+                  </>
+                )}
+                <div className="flex">
+                  <button
+                    onClick={() => onPreviewRenderClick()}
+                    className={`bg-gray-200 p-4 text-xl rounded mt-6 block m-auto w-40`}
+                  >
+                    {previewRendering
+                      ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
+                      : <span>Preview</span>
+                    }
+                  </button>
+                  <button
+                    onClick={() => onRenderClick()}
+                    className={`${rendering ? 'bg-gray-500' : 'bg-green-500'} p-4 text-xl rounded mt-6 block m-auto w-40`}
+                  >
+                    {rendering
+                      ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
+                      : <span>Download</span>
+                    }
+                  </button>
                 </div>
               </div>
             ) : (
                 <img alt="loading-spinner" src="spinner.gif" className="ml-auto mr-auto mt-20 mb-20" />
               )}
-            <div className="">
-              <div className="flex">
-                <div className="text-2xl inline-block flex-none">Add Text:</div>
-                <input
-                  ref={textRef}
-                  type="text"
-                  className="pl-1 p-0.5 border-b-2 outline-none focus:border-blue-300 mr-3 ml-3 text-2xl"
-                />
-                <button
-                  onClick={() => onAddTextClick()}
-                  className="bg-blue-300 p-2.5 rounded flex-none"
-                >Add</button>
-              </div>
-              <div className="mt-3">
-                <div className="text-2xl inline-block w-60 flex-none">Font Size:</div>
-                <input
-                  ref={fontSizeRef}
-                  type="number"
-                  value={fontSize}
-                  onChange={onFontSizeChange}
-                  className="pl-3 border-b-2 outline-none focus:border-blue-300 flex-none mr-3 ml-3 w-24 text-2xl text-center"
-                />
-                <span className="text-2xl">px</span>
-              </div>
-              <div className="text-2xl mt-3 inline-block w-60 flex-none">Final Gif Speed:</div>
-              <input
-                ref={delayRef}
-                type="number"
-                value={delay}
-                onChange={() => setDelay(parseInt(delayRef.current.value))}
-                className="pl-3 border-b-2 text-2xl outline-none focus:border-blue-300 ml-3 mr-3 w-24 text-center"
-              />
-              <span className="text-2xl mt-3">ms</span>
-            </div>
-            <br />
-            <div className="flex">
-              <button
-                onClick={() => onPreviewRenderClick()}
-                className={`bg-gray-200 p-4 text-xl rounded mt-6 block m-auto w-40`}
-              >
-                {previewRendering
-                  ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
-                  : <span>Preview</span>
-                }
-              </button>
-              <button
-                onClick={() => onRenderClick()}
-                className={`${rendering ? 'bg-gray-500' : 'bg-green-500'} p-4 text-xl rounded mt-6 block m-auto w-40`}
-              >
-                {rendering
-                  ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
-                  : <span>Download</span>
-                }
-              </button>
-            </div>
           </div>
           { previewModalOpen && (
             <PreviewModal onClose={onPreviewClose}>
