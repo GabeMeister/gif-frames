@@ -3,8 +3,7 @@ import OnImagesLoaded from 'react-on-images-loaded';
 import ImageLayer from './ImageLayer';
 import TextLayer from './TextLayer';
 
-export default function GifRenderer({ framesModel, onFinish, delay, fontSize = 32 }) {
-
+export default function GifRenderer({ frames, onFinish, delay, fontSize = 32 }) {
   function onAllImagesLoaded() {
     var gif = new window.GIF({
       workers: 2,
@@ -19,8 +18,8 @@ export default function GifRenderer({ framesModel, onFinish, delay, fontSize = 3
 
       // Create new canvas to stuff everything in
       const final = document.createElement('canvas');
-      final.width = framesModel[0].imageLayerModel.width;
-      final.height = framesModel[0].imageLayerModel.height;
+      final.width = frames[0].imageLayerModel.width;
+      final.height = frames[0].imageLayerModel.height;
       const ctx = final.getContext('2d');
 
       // Setup the font style
@@ -32,7 +31,7 @@ export default function GifRenderer({ framesModel, onFinish, delay, fontSize = 3
       ctx.drawImage(img, 0, 0);
 
       // Add text to the canvas
-      framesModel[i].textLayerModel.textList.forEach(t => {
+      frames[i].textLayerModel.textList.forEach(t => {
         ctx.fillText(t.text, t.x, t.y);
       });
 
@@ -52,7 +51,7 @@ export default function GifRenderer({ framesModel, onFinish, delay, fontSize = 3
   return (
     <div className="gif-renderer hidden -ml-96">
       <OnImagesLoaded onLoaded={onAllImagesLoaded}>
-        {framesModel.map((f, i) => {
+        {frames.map((f, i) => {
           return (
             <div key={`rendered-frame-${f.getHash()}`}>
               <ImageLayer

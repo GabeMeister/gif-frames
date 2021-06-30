@@ -19,6 +19,8 @@
     "react-on-images-loaded": "^2.2.5",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
+    "recoil": "^0.3.1",
+    "styled-components": "^5.3.0",
     "tailwindcss": "^2.0.2"
   },
   "scripts": {

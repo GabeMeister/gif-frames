@@ -8,9 +8,7 @@ import RadioTab from '../RadioTab';
 
 export default function HomePage() {
   const [gifUrl, setGifUrl] = useState('');
-
   const [redirecting, setRedirecting] = useState(false);
-
   const [fetchLoading, setFetchLoading] = useState(false);
   const gifUrlRef = useRef(null);
 

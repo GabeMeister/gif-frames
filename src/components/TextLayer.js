@@ -1,27 +1,32 @@
 import React, { useEffect, useState, useRef } from 'react';
 import cloneDeep from 'lodash.clonedeep';
+import {
+  useRecoilState
+} from 'recoil';
+// import textLayerState from './state/atoms/textLayerState';
+import selectedTextIndexState from './state/atoms/selectedTextIndexState';
 
-export default function TextLayer({ textLayerModel, onTextMove = () => { }, isLocked, showWarning }) {
+export default function TextLayer({ initialTextList }) {
   const canvasRef = useRef(null);
   const [mouseDown, setMouseDown] = useState(false);
-  const [layerData, setLayerData] = useState(textLayerModel);
   const [coord, setCoord] = useState({ x: -1, y: -1 });
-  const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
+  const [selectedTextIndex, setSelectedTextIndex] = useRecoilState(selectedTextIndexState);
   const [canvasTextList, setCanvasTextList] = useState([]);
+  const [textList, setTextList] = useState(initialTextList);
 
   useEffect(() => {
     const ctx = canvasRef.current.getContext('2d');
     // Setup the font style
     ctx.fillStyle = 'red';
-    ctx.font = `${layerData.fontSize}px Impact, Charcoal, sans-serif`;
+    ctx.font = `${textList.fontSize}px Impact, Charcoal, sans-serif`;
 
     // Clear canvas and repaint all the things
-    ctx.clearRect(0, 0, layerData.width, layerData.height);
+    ctx.clearRect(0, 0, textList.width, textList.height);
 
-    const canvasTexts = layerData.textList.map(text => {
+    const canvasTexts = textList.textList.map(text => {
       return {
         ...text,
-        height: layerData.fontSize,
+        height: textList.fontSize,
         width: ctx.measureText(text.text).width
       };
     });
@@ -40,7 +45,7 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { }, isLo
     });
 
     setCanvasTextList(canvasTexts);
-  }, [layerData, selectedTextIndex]);
+  }, [textList, selectedTextIndex]);
 
   function isTextClicked(text, x, y) {
     return (
@@ -52,12 +57,6 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { }, isLo
   }
 
   function onMouseDown(e) {
-    if (!isLocked) {
-      showWarning(true);
-      return;
-    }
-
-    showWarning(false);
     setMouseDown(true);
 
     const pos = getMousePos(canvasRef.current, e);
@@ -84,35 +83,29 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { }, isLo
     const pos = getMousePos(canvasRef.current, e);
 
     if (mouseDown && selectedTextIndex >= 0) {
-      let layerDataClone = cloneDeep(layerData);
+      let textListClone = cloneDeep(textList);
 
       const xChange = pos.x - coord.x;
       const yChange = pos.y - coord.y;
 
-      layerDataClone.textList[selectedTextIndex].x += xChange;
-      layerDataClone.textList[selectedTextIndex].y += yChange;
+      textListClone.textList[selectedTextIndex].x += xChange;
+      textListClone.textList[selectedTextIndex].y += yChange;
 
       setCoord({
         x: pos.x,
         y: pos.y
       });
 
-      onTextMove({
-        textLayerData: layerDataClone
-      });
-
-      setLayerData(layerDataClone);
+      setTextList(textListClone);
     }
 
     const index = canvasTextList.findIndex(text => isTextClicked(text, pos.x, pos.y));
     if (index >= 0) {
-      if (isLocked) {
-        if (mouseDown) {
-          canvasRef.current.style.cursor = 'grabbing';
-        }
-        else {
-          canvasRef.current.style.cursor = 'grab';
-        }
+      if (mouseDown) {
+        canvasRef.current.style.cursor = 'grabbing';
+      }
+      else {
+        canvasRef.current.style.cursor = 'grab';
       }
     }
     else {
@@ -130,10 +123,10 @@ export default function TextLayer({ textLayerModel, onTextMove = () => { }, isLo
 
   return (
     <canvas
-      id={layerData.getHash()}
+      id={textList.getHash()}
       ref={canvasRef}
-      height={layerData.height}
-      width={layerData.width}
+      height={textList.height}
+      width={textList.width}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}

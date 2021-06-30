@@ -8,7 +8,7 @@ import {
 
 import './reset.css';
 import './App.css';
-import EditorPage from './components/pages/EditorPage';
+import EditorPage2 from './components/pages/EditorPage2';
 import HomePage from './components/pages/HomePage';
 
 window.$ = $;
@@ -20,7 +20,7 @@ function App() {
         <div>
           <Switch>
             <Route path='/editor'>
-              <EditorPage />
+              <EditorPage2 />
             </Route>
             <Route path="/">
               <HomePage />
