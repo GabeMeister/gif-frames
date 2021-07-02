@@ -2,7 +2,7 @@ import { atom } from 'recoil';
 
 const frameIndexState = atom({
   key: 'frameIndexState',
-  default: 0
+  default: -1
 });
 
 export default frameIndexState;

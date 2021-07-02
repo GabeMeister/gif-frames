@@ -2,7 +2,8 @@ import { atom } from 'recoil';
 
 const framesState = atom({
   key: 'framesState',
-  default: []
+  default: [],
+  dangerouslyAllowMutability: true
 });
 
 export default framesState;

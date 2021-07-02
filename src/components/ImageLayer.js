@@ -1,9 +1,14 @@
 import React from 'react';
+import styled from 'styled-components';
+
+const StyledImageLayerImg = styled.img`
+  position: absolute;
+  select: none;
+`;
 
 export default function ImageLayer({ imageLayerData }) {
-  console.log('***** imageLayerData.dataUrl *****', imageLayerData.dataUrl);
   return (
-    <img
+    <StyledImageLayerImg
       src={imageLayerData.dataUrl}
       alt={`frame-thumbnail`}
       className="js-frame-img select-none m-auto"

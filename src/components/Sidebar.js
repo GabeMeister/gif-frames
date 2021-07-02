@@ -1,25 +1,36 @@
 import React from 'react';
+import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
+import selectedTextIdState from './state/atoms/selectedTextIdState';
 
-const StyledSidebarUL = styled.div`
+const StyledSidebarDiv = styled.ul`
   position: absolute;
   top: 100px;
   left: 0;
-  width: 200px;
+  width: 180px;
   height: 700px;
   background-color: lightsteelblue;
 `;
 
 // A sidebar that holds all the different texts of the current frame
-export default function Sidebar({onTextSelect}) {
+export default function Sidebar({ textLayerData, onTextSelect}) {
+  const [selectedTextId, setSelectedTextId] = useRecoilState(selectedTextIdState);
+  
   return (
-    <StyledSidebarUL>
-      <input type="radio" id="dog" name="text_list" value="dog" />
-      <label htmlFor="dog">Dog</label><br />
-      <input type="radio" id="cat" name="text_list" value="cat" />
-      <label htmlFor="cat">Cat</label><br />
-      <input type="radio" id="zebra" name="text_list" value="zebra" />
-      <label htmlFor="zebra">Zebra</label><br />
-    </StyledSidebarUL>
+    <StyledSidebarDiv>
+      {textLayerData && textLayerData.textList.map(text => (
+        <li key={text.id}>
+          <input
+            type="radio"
+            id={text.id}
+            name="text_list"
+            value={text.id}
+            checked={text.id === selectedTextId}
+            onChange={evt => setSelectedTextId(evt.target.value)}
+          />
+          <label htmlFor={text.id}>{text.text}</label><br />
+        </li>
+      ))}
+    </StyledSidebarDiv>
   );
 }

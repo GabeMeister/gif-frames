@@ -1,5 +1,10 @@
 import md5 from "md5";
 
+
+function idFromStr(str) {
+  return str.replace(/\s+/g, '-').toLowerCase();
+}
+
 class TextLayerData {
   constructor(height, width, textList = [], fontSize = 32) {
     this.height = height;
@@ -8,12 +13,16 @@ class TextLayerData {
     this.fontSize = fontSize;
   }
 
-  addText(text) {
+  addText(text, x = this.width / 2, y = this.height / 2) {
+    const id = md5(idFromStr(text));
     this.textList.push({
+      id,
       text,
       x: this.width / 2,
-      y: this.height / 2,
+      y: this.height / 2
     });
+
+    return id;
   }
 
   getHash() {
