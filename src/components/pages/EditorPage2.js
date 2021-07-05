@@ -4,6 +4,7 @@ import styled from "styled-components";
 import cloneDeep from "lodash.clonedeep";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import gifFrames from "gif-frames";
+import Hotkeys from "react-hot-keys";
 
 import Sidebar from "../Sidebar";
 import Button from "../Button";
@@ -23,6 +24,7 @@ const StyledEditorPageDiv = styled.div`
   width: 1024px;
   background-color: lightgray;
   margin: auto;
+  height: 100vh;
 `;
 
 const AddTextBtn = styled(Button)`
@@ -41,8 +43,6 @@ export default function EditorPage2() {
   const [selectedTextId, setSelectedTextId] = useRecoilState(selectedTextIdState);
   
   const textListWithoutSelectedText = frames[frameIdx]?.textLayerData?.textList?.filter(textData => textData.id !== selectedTextId);
-
-  // console.log('***** EditorPage2 *****', frames);
 
   // Retrieve the gifUrl query param
   let query = useQuery();
@@ -69,6 +69,10 @@ export default function EditorPage2() {
       // Then obviously move to the next frame
       setFrameIdx(frameIdx + 1);
     }
+  }
+
+  function onKeyDown(keyName, e, handle) {
+    onNextFrame();
   }
 
   function goToBeginning() {
@@ -137,40 +141,43 @@ export default function EditorPage2() {
   }, [gifUrl, setFrames, setFrameIdx, setFrameSize]);
 
   return (
-    <StyledEditorPageDiv>
-      {frames.length !== 0 && (
-        <>
-          <Sidebar textLayerData={frames[frameIdx].textLayerData} />
-          <div>
-            <ImageLayer
-              imageLayerData={frames[frameIdx].imageLayerData}
-            />
-            {selectedTextId && (
-              <>
-                {textListWithoutSelectedText.length !== 0 && (
-                  <BackgroundTextLayer
-                    textList={textListWithoutSelectedText}
-                  />
-                )}
+    <Hotkeys
+      keyName="enter"
+      onKeyDown={onKeyDown}
+    >
+      <StyledEditorPageDiv className="yoo">
+        {frames.length !== 0 && (
+          <>
+            <Sidebar textLayerData={frames[frameIdx].textLayerData} />
+            <div>
+              <ImageLayer
+                imageLayerData={frames[frameIdx].imageLayerData}
+              />
+              {textListWithoutSelectedText.length !== 0 && (
+                <BackgroundTextLayer
+                  textList={textListWithoutSelectedText}
+                />
+              )}
+              {selectedTextId && (
                 <DraggableTextLayer
                   key={selectedTextId}
                   initialTextData={frames[frameIdx].textLayerData.textList.find(textData => textData.id === selectedTextId)}
                 />
-              </>
-            )}
-          </div>
-          <Controls>
-            <input type="text" ref={textRef} />
-            <AddTextBtn onClick={() => addText(textRef.current.value)}>Add</AddTextBtn>
-            <br />
-            <br />
-            <Button color="orange" onClick={onNextFrame}>Next Frame</Button>
-            <br />
-            <br />
-            <Button color="purple" onClick={goToBeginning}>Go to First Frame</Button>
-          </Controls>
-        </>
-      )}
-    </StyledEditorPageDiv>
+              )}
+            </div>
+            <Controls>
+              <input type="text" ref={textRef} />
+              <AddTextBtn onClick={() => addText(textRef.current.value)}>Add</AddTextBtn>
+              <br />
+              <br />
+              <Button color="orange" onClick={onNextFrame}>Next Frame</Button>
+              <br />
+              <br />
+              <Button color="purple" onClick={goToBeginning}>Go to First Frame</Button>
+            </Controls>
+          </>
+        )}
+      </StyledEditorPageDiv>
+    </Hotkeys>
   );
 }

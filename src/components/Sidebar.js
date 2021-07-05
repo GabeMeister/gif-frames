@@ -13,7 +13,7 @@ const StyledSidebarDiv = styled.ul`
 `;
 
 // A sidebar that holds all the different texts of the current frame
-export default function Sidebar({ textLayerData, onTextSelect}) {
+export default function Sidebar({ textLayerData }) {
   const [selectedTextId, setSelectedTextId] = useRecoilState(selectedTextIdState);
   
   return (
@@ -21,12 +21,21 @@ export default function Sidebar({ textLayerData, onTextSelect}) {
       {textLayerData && textLayerData.textList.map(text => (
         <li key={text.id}>
           <input
-            type="radio"
+            type="checkbox"
             id={text.id}
             name="text_list"
             value={text.id}
             checked={text.id === selectedTextId}
-            onChange={evt => setSelectedTextId(evt.target.value)}
+            onChange={evt => {
+              // Sometimes the user doesn't want any text selected, so allow for
+              // unchecking
+              if(selectedTextId === evt.target.value) {
+                setSelectedTextId(null);
+              }
+              else {
+                setSelectedTextId(evt.target.value);
+              }
+            }}
           />
           <label htmlFor={text.id}>{text.text}</label><br />
         </li>

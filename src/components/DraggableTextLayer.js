@@ -16,16 +16,18 @@ const StyledDraggableTextLayerWrapperDiv = styled.div`
 `;
 
 export default function DraggableTextLayer({ initialTextData }) {
-  // console.log('***** DraggableTextLayer *****');
   const canvasRef = useRef();
   const frameSize = useRecoilValue(frameSizeState);
   const frameIdx = useRecoilValue(frameIndexState);
   const selectedTextId = useRecoilValue(selectedTextIdState);
   const [mouseDown, setMouseDown] = useState(false);
+  const [isTextClicked, setIsTextClicked] = useState(false);
   const [textData, setTextData] = useState(initialTextData);
+  const [canvasTextData, setCanvasTextData] = useState({});
   const [frames, setFrames] = useRecoilState(framesState);
+  const [cursorPos, setCursorPos] = useState({ x: -1, y: -1 });
 
-  function isTextClicked(text, x, y) {
+  function isCursorPositionOverText(text, x, y) {
     return (
       x >= text.x
       && x <= (text.x + text.width)
@@ -38,51 +40,57 @@ export default function DraggableTextLayer({ initialTextData }) {
     setMouseDown(true);
 
     const pos = getMousePos(canvasRef.current, e);
-    const isClicked = isTextClicked(textData, pos.x, pos.y);
 
-    if (isClicked) {
-
+    if (isCursorPositionOverText(canvasTextData, pos.x, pos.y)) {
+      setCursorPos(pos);
+      setIsTextClicked(true);
     }
   }
 
   function onMouseUp(e) {
     setMouseDown(false);
+    setIsTextClicked(false);
 
     let newFrames = renderText(frames, frameIdx, selectedTextId, PositionBuffer.x, PositionBuffer.y);
     setFrames(newFrames);
   }
 
   function onMouseMove(e) {
-    const pos = getMousePos(canvasRef.current, e);
+    const currentCursorPos = getMousePos(canvasRef.current, e);
 
     if (mouseDown) {
       let textDataCpy = cloneDeep(textData);
 
-      const xChange = pos.x - textData.x;
-      const yChange = pos.y - textData.y;
+      // Figure out the difference in how much the cursor has moved from last time
+      const xChange = currentCursorPos.x - cursorPos.x;
+      const yChange = currentCursorPos.y - cursorPos.y;
 
       textDataCpy.x += xChange;
       textDataCpy.y += yChange;
 
       setTextData(textDataCpy);
+      setCursorPos(currentCursorPos);
 
       // Also need to store the new x and y to the position buffer
       PositionBuffer.x = textDataCpy.x;
       PositionBuffer.y = textDataCpy.y;
     }
 
-    // const index = canvasTextList.findIndex(text => isTextClicked(text, pos.x, pos.y));
-    // if (index >= 0) {
-    //   if (mouseDown) {
-    //     canvasRef.current.style.cursor = 'grabbing';
-    //   }
-    //   else {
-    //     canvasRef.current.style.cursor = 'grab';
-    //   }
-    // }
-    // else {
-    //   canvasRef.current.style.cursor = 'default';
-    // }
+    handleCursorStyling(currentCursorPos);
+  }
+
+  function handleCursorStyling(pos) {
+    if (isTextClicked || isCursorPositionOverText(canvasTextData, pos.x, pos.y)) {
+      if (mouseDown) {
+        canvasRef.current.style.cursor = 'grabbing';
+      }
+      else {
+        canvasRef.current.style.cursor = 'grab';
+      }
+    }
+    else {
+      canvasRef.current.style.cursor = 'default';
+    }
   }
 
   function getMousePos(canvas, evt) {
@@ -102,7 +110,22 @@ export default function DraggableTextLayer({ initialTextData }) {
     ctx.font = `32px Impact, Charcoal, sans-serif`;
     ctx.fillStyle = "red";
     ctx.fillText(textData.text, textData.x, textData.y);
-  }, [textData, frameSize]);
+
+    // Need to calculate the text width based off of the canvas context
+    const canvasText = cloneDeep(textData);
+    canvasText.width = ctx.measureText(textData.text).width;
+    canvasText.height = 25;
+    setCanvasTextData(canvasText);
+    
+    // Put a nice little box as a visual indicator around the text you can
+    // actually drag around
+    ctx.beginPath();
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = "2";
+    const padding = 10;
+    ctx.rect(canvasText.x - padding, canvasText.y - canvasText.height - padding, canvasText.width + (padding*2), canvasText.height + (padding*2));
+    ctx.stroke();
+  }, [textData, frameSize, setCanvasTextData]);
 
   return (
     <StyledDraggableTextLayerWrapperDiv>
