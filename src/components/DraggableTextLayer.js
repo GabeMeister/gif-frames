@@ -108,7 +108,7 @@ export default function DraggableTextLayer({ initialTextData }) {
     ctx.clearRect(0, 0, frameSize.width, frameSize.height);
 
     ctx.font = `32px Impact, Charcoal, sans-serif`;
-    ctx.fillStyle = "red";
+    ctx.fillStyle = textData.color;
     ctx.fillText(textData.text, textData.x, textData.y);
 
     // Need to calculate the text width based off of the canvas context
@@ -120,7 +120,7 @@ export default function DraggableTextLayer({ initialTextData }) {
     // Put a nice little box as a visual indicator around the text you can
     // actually drag around
     ctx.beginPath();
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = "gray";
     ctx.lineWidth = "2";
     const padding = 10;
     ctx.rect(canvasText.x - padding, canvasText.y - canvasText.height - padding, canvasText.width + (padding*2), canvasText.height + (padding*2));

@@ -1,9 +1,9 @@
 import React from 'react';
 import OnImagesLoaded from 'react-on-images-loaded';
 import ImageLayer from './ImageLayer';
-import TextLayer from './TextLayer';
+import BackgroundTextLayer from './BackgroundTextLayer';
 
-export default function GifRenderer({ frames, onFinish, delay, fontSize = 32 }) {
+export default function GifRenderer({ frames, onFinish, delay = 10, fontSize = 32 }) {
   function onAllImagesLoaded() {
     var gif = new window.GIF({
       workers: 2,
@@ -18,12 +18,11 @@ export default function GifRenderer({ frames, onFinish, delay, fontSize = 32 }) 
 
       // Create new canvas to stuff everything in
       const final = document.createElement('canvas');
-      final.width = frames[0].imageLayerModel.width;
-      final.height = frames[0].imageLayerModel.height;
+      final.width = frames[0].imageLayerData.width;
+      final.height = frames[0].imageLayerData.height;
       const ctx = final.getContext('2d');
 
       // Setup the font style
-      ctx.fillStyle = 'red';
       ctx.font = `${fontSize}px Impact, Charcoal, sans-serif`;
 
       // Add image to the canvas
@@ -31,7 +30,8 @@ export default function GifRenderer({ frames, onFinish, delay, fontSize = 32 }) 
       ctx.drawImage(img, 0, 0);
 
       // Add text to the canvas
-      frames[i].textLayerModel.textList.forEach(t => {
+      frames[i].textLayerData.textList.forEach(t => {
+        ctx.fillStyle = t.color;
         ctx.fillText(t.text, t.x, t.y);
       });
 
@@ -56,11 +56,11 @@ export default function GifRenderer({ frames, onFinish, delay, fontSize = 32 }) 
             <div key={`rendered-frame-${f.getHash()}`}>
               <ImageLayer
                 key={`rendered-image-${f.getHash()}`}
-                imageLayerModel={f.imageLayerModel}
+                imageLayerData={f.imageLayerData}
               />
-              <TextLayer
+              <BackgroundTextLayer
                 key={`rendered-text-${f.getHash()}`}
-                textLayerModel={f.textLayerModel}
+                textList={f.textLayerData.textList}
               />
             </div>
           );

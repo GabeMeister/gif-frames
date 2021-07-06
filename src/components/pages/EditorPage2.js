@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import cloneDeep from "lodash.clonedeep";
@@ -19,6 +19,7 @@ import BackgroundTextLayer from "../BackgroundTextLayer";
 import Controls from "../Controls";
 import PositionBuffer from "../../data-models/PositionBuffer";
 import { renderText } from "../lib/frames";
+import GifRenderer from "../GifRenderer";
 
 const StyledEditorPageDiv = styled.div`
   width: 1024px;
@@ -37,6 +38,7 @@ function useQuery() {
 
 export default function EditorPage2() {
   const textRef = useRef();
+  const [rendering, setRendering] = useState(false);
   const [frames, setFrames] = useRecoilState(framesState);
   const [frameIdx, setFrameIdx] = useRecoilState(frameIndexState);
   const setFrameSize = useSetRecoilState(frameSizeState);
@@ -113,6 +115,22 @@ export default function EditorPage2() {
     return framesCpy;
   }
 
+  function onRenderClick() {
+    setRendering(true);
+  }
+
+  function onRenderFinish(url) {
+    setRendering(false);
+
+    // Create "hidden" link, click it to download the gif, then remove the link
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "finished.gif");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   useEffect(() => {
     // If we don't have a gif url don't do anything, we're about to redirect
     // back to the home page anyway
@@ -173,8 +191,17 @@ export default function EditorPage2() {
               <Button color="orange" onClick={onNextFrame}>Next Frame</Button>
               <br />
               <br />
-              <Button color="purple" onClick={goToBeginning}>Go to First Frame</Button>
+              <Button color="BurlyWood" onClick={goToBeginning}>Go to First Frame</Button>
+              <br />
+              <br />
+              <Button color="lightgreen" onClick={onRenderClick}>Render</Button>
             </Controls>
+            {rendering && (
+              <GifRenderer
+                frames={frames}
+                onFinish={onRenderFinish}
+              />
+            )}
           </>
         )}
       </StyledEditorPageDiv>

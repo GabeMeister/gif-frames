@@ -1,5 +1,16 @@
 import md5 from "md5";
 
+const COLORS = [
+  'red',
+  'blue',
+  'orange',
+  'green',
+  'black',
+  'purple',
+  'gray',
+  'pink',
+  'violet'
+];
 
 function idFromStr(str) {
   return str.replace(/\s+/g, '-').toLowerCase();
@@ -14,12 +25,17 @@ class TextLayerData {
   }
 
   addText(text, x = this.width / 2, y = this.height / 2) {
+    if(this.textList.length > COLORS.length) {
+      throw new Error('Too many texts added, not enough colors to support');
+    }
+    
     const id = md5(idFromStr(text));
     this.textList.push({
       id,
       text,
       x: this.width / 2,
-      y: this.height / 2
+      y: this.height / 2,
+      color: COLORS[this.textList.length]
     });
 
     return id;

@@ -18,7 +18,6 @@ export default function BackgroundTextLayer({ textList = [] }) {
   useEffect(() => {
     const ctx = canvasRef.current.getContext('2d');
     // Setup the font style
-    ctx.fillStyle = 'black';
     ctx.font = `32px Impact, Charcoal, sans-serif`;
 
     // Clear canvas and repaint all the things
@@ -26,6 +25,7 @@ export default function BackgroundTextLayer({ textList = [] }) {
 
     // Iterate through the texts and paint them on
     textList.forEach(textData => {
+      ctx.fillStyle = textData.color;
       ctx.fillText(textData.text, textData.x, textData.y);
     });
   }, [textList, frameSize]);
@@ -37,6 +37,7 @@ export default function BackgroundTextLayer({ textList = [] }) {
         ref={canvasRef}
         height={frameSize.height}
         width={frameSize.width}
+        className="js-frame-canvas"
       />
     </StyledBackgroundTextLayerWrapperDiv>
   );
