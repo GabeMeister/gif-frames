@@ -2,7 +2,7 @@ import { atom } from 'recoil';
 
 const delayState = atom({
   key: 'delayState',
-  default: null
+  default: 10
 });
 
 export default delayState;

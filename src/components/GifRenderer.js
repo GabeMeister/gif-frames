@@ -1,9 +1,13 @@
 import React from 'react';
 import OnImagesLoaded from 'react-on-images-loaded';
 import ImageLayer from './ImageLayer';
+import { useRecoilValue } from 'recoil';
 import BackgroundTextLayer from './BackgroundTextLayer';
+import fontSizeState from "./state/atoms/fontSizeState";
 
-export default function GifRenderer({ frames, onFinish, delay = 10, fontSize = 32 }) {
+export default function GifRenderer({ frames, onFinish, delay = 10 }) {
+  const fontSize = useRecoilValue(fontSizeState);
+  
   function onAllImagesLoaded() {
     var gif = new window.GIF({
       workers: 2,
@@ -37,7 +41,7 @@ export default function GifRenderer({ frames, onFinish, delay = 10, fontSize = 3
 
       // Add the final frame
       gif.addFrame(final, {
-        delay: delay * 7
+        delay: delay
       });
     }
 

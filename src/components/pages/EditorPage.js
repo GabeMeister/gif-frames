@@ -20,8 +20,6 @@ import Sidebar from "../Sidebar";
  * STATE CLASSES
  */
 import FrameModel from "../../models/FrameModel";
-// import TextLayerModel from "../../models/TextLayerModel";
-import TextLayerBuffer from "../state/TextLayerBuffer";
 
 /*
  * STATE
@@ -37,7 +35,6 @@ function useQuery() {
 }
 
 export default function EditorPage() {
-  console.log('EditorPage');
   const [delay, setDelay] = useState(100);
   const [rendering, setRendering] = useState(false);
   const [previewRendering, setPreviewRendering] = useState(false);
@@ -49,7 +46,6 @@ export default function EditorPage() {
    * REFS
    */
   const editorRef = useRef(null);
-  const textRef = useRef(null);
   const delayRef = useRef(null);
   const fontSizeRef = useRef(null);
 
@@ -204,24 +200,10 @@ export default function EditorPage() {
     }
   }
 
-  function onAddTextClick() {
-    const newText = textRef.current.value;
-    // Only add to the buffer, we won't render the frame until the frame is submitted
-    TextLayerBuffer.addText(newText);
-
-    textRef.current.value = "";
-  }
-
   function onFrameIdxChange(newFrameIdx) {
     if (newFrameIdx >= 0 && newFrameIdx < frames.length) {
       renderCurrentFrame();
-
       setFrameIdx(newFrameIdx);
-      
-      // Set the text layer to match the new frame
-      // if(frames[newFrameIdx].textLayerModel.textList.length) {
-      //   TextBuffer
-      // }
     }
   }
 
@@ -362,22 +344,6 @@ export default function EditorPage() {
                 </div>
                 <>
                   <div>
-                    <div className="flex mt-3">
-                      <div className="text-2xl inline-block flex-none">
-                        Add Text:
-                      </div>
-                      <input
-                        ref={textRef}
-                        type="text"
-                        className="pl-1 p-0.5 border-b-2 outline-none focus:border-blue-300 mr-3 ml-3 text-2xl"
-                      />
-                      <button
-                        onClick={() => onAddTextClick()}
-                        className="bg-blue-300 p-2.5 rounded flex-none"
-                      >
-                        Add
-                      </button>
-                    </div>
                     <div className="mt-3">
                       <div className="text-2xl inline-block w-60 flex-none">
                         Font Size:

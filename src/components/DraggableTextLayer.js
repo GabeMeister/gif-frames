@@ -7,6 +7,7 @@ import styled from "styled-components";
 import PositionBuffer from "../data-models/PositionBuffer";
 import { renderText } from "./lib/frames";
 import framesState from "./state/atoms/framesState";
+import fontSizeState from "./state/atoms/fontSizeState";
 import frameIndexState from "./state/atoms/frameIndexState";
 import selectedTextIdState from "./state/atoms/selectedTextIdState";
 
@@ -18,6 +19,7 @@ const StyledDraggableTextLayerWrapperDiv = styled.div`
 export default function DraggableTextLayer({ initialTextData }) {
   const canvasRef = useRef();
   const frameSize = useRecoilValue(frameSizeState);
+  const fontSize = useRecoilValue(fontSizeState);
   const frameIdx = useRecoilValue(frameIndexState);
   const selectedTextId = useRecoilValue(selectedTextIdState);
   const [mouseDown, setMouseDown] = useState(false);
@@ -107,25 +109,27 @@ export default function DraggableTextLayer({ initialTextData }) {
     // Clear all pre-existing text first
     ctx.clearRect(0, 0, frameSize.width, frameSize.height);
 
-    ctx.font = `32px Impact, Charcoal, sans-serif`;
+    ctx.font = `${fontSize}px Impact, Charcoal, sans-serif`;
     ctx.fillStyle = textData.color;
     ctx.fillText(textData.text, textData.x, textData.y);
 
     // Need to calculate the text width based off of the canvas context
     const canvasText = cloneDeep(textData);
-    canvasText.width = ctx.measureText(textData.text).width;
-    canvasText.height = 25;
+    const textMetrics = ctx.measureText(textData.text);
+    canvasText.width = textMetrics.width;
+    canvasText.height = textMetrics.fontBoundingBoxAscent - textMetrics.fontBoundingBoxDescent;
     setCanvasTextData(canvasText);
     
     // Put a nice little box as a visual indicator around the text you can
     // actually drag around
     ctx.beginPath();
+    ctx.setLineDash([6]);
     ctx.strokeStyle = "gray";
     ctx.lineWidth = "2";
     const padding = 10;
     ctx.rect(canvasText.x - padding, canvasText.y - canvasText.height - padding, canvasText.width + (padding*2), canvasText.height + (padding*2));
     ctx.stroke();
-  }, [textData, frameSize, setCanvasTextData]);
+  }, [textData, frameSize, setCanvasTextData, fontSize]);
 
   return (
     <StyledDraggableTextLayerWrapperDiv>

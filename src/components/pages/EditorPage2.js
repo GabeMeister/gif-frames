@@ -1,12 +1,13 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import cloneDeep from "lodash.clonedeep";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import gifFrames from "gif-frames";
 import Hotkeys from "react-hot-keys";
+import { Link } from 'react-router-dom';
 
-import Sidebar from "../Sidebar";
+import EditorSidebar from "../EditorPageSidebar";
 import Button from "../Button";
 import FrameData from "../../data-models/FrameData";
 import framesState from "../../components/state/atoms/framesState";
@@ -19,7 +20,6 @@ import BackgroundTextLayer from "../BackgroundTextLayer";
 import Controls from "../Controls";
 import PositionBuffer from "../../data-models/PositionBuffer";
 import { renderText } from "../lib/frames";
-import GifRenderer from "../GifRenderer";
 
 const StyledEditorPageDiv = styled.div`
   width: 1024px;
@@ -28,17 +28,11 @@ const StyledEditorPageDiv = styled.div`
   height: 100vh;
 `;
 
-const AddTextBtn = styled(Button)`
-  margin-left: 5px;
-`;
-
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
 export default function EditorPage2() {
-  const textRef = useRef();
-  const [rendering, setRendering] = useState(false);
   const [frames, setFrames] = useRecoilState(framesState);
   const [frameIdx, setFrameIdx] = useRecoilState(frameIndexState);
   const setFrameSize = useSetRecoilState(frameSizeState);
@@ -49,13 +43,6 @@ export default function EditorPage2() {
   // Retrieve the gifUrl query param
   let query = useQuery();
   const gifUrl = query.get("gifUrl");
-
-  function addText(text) {
-    let framesCpy = cloneDeep(frames);
-    const newTextId = framesCpy[frameIdx].textLayerData.addText(text);
-    setFrames(framesCpy);
-    setSelectedTextId(newTextId);
-  }
 
   function onNextFrame() {
     if(frameIdx < frames.length - 1) {
@@ -85,6 +72,8 @@ export default function EditorPage2() {
     setFrames(newFrames);
 
     setFrameIdx(0);
+
+    setSelectedTextId(null);
   }
 
   function copyFrameToNext(currentFrames) {
@@ -113,22 +102,6 @@ export default function EditorPage2() {
     }
 
     return framesCpy;
-  }
-
-  function onRenderClick() {
-    setRendering(true);
-  }
-
-  function onRenderFinish(url) {
-    setRendering(false);
-
-    // Create "hidden" link, click it to download the gif, then remove the link
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "finished.gif");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   }
 
   useEffect(() => {
@@ -166,7 +139,7 @@ export default function EditorPage2() {
       <StyledEditorPageDiv className="yoo">
         {frames.length !== 0 && (
           <>
-            <Sidebar textLayerData={frames[frameIdx].textLayerData} />
+            <EditorSidebar textLayerData={frames[frameIdx].textLayerData} />
             <div>
               <ImageLayer
                 imageLayerData={frames[frameIdx].imageLayerData}
@@ -184,9 +157,9 @@ export default function EditorPage2() {
               )}
             </div>
             <Controls>
-              <input type="text" ref={textRef} />
-              <AddTextBtn onClick={() => addText(textRef.current.value)}>Add</AddTextBtn>
-              <br />
+              <div>
+                <h1>{frameIdx + 1} / {frames.length}</h1>
+              </div>
               <br />
               <Button color="orange" onClick={onNextFrame}>Next Frame</Button>
               <br />
@@ -194,14 +167,8 @@ export default function EditorPage2() {
               <Button color="BurlyWood" onClick={goToBeginning}>Go to First Frame</Button>
               <br />
               <br />
-              <Button color="lightgreen" onClick={onRenderClick}>Render</Button>
+              <Button color="lightgreen"><Link to="/render">Render and Preview</Link></Button>
             </Controls>
-            {rendering && (
-              <GifRenderer
-                frames={frames}
-                onFinish={onRenderFinish}
-              />
-            )}
           </>
         )}
       </StyledEditorPageDiv>

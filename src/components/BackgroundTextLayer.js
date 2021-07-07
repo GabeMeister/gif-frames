@@ -3,6 +3,7 @@ import {
   useRecoilValue
 } from 'recoil';
 import frameSizeState from './state/atoms/frameSizeState';
+import fontSizeState from "./state/atoms/fontSizeState";
 import md5 from 'md5';
 import styled from 'styled-components';
 
@@ -14,11 +15,12 @@ const StyledBackgroundTextLayerWrapperDiv = styled.div`
 export default function BackgroundTextLayer({ textList = [] }) {
   const canvasRef = useRef(null);
   const frameSize = useRecoilValue(frameSizeState);
+  const fontSize = useRecoilValue(fontSizeState);
 
   useEffect(() => {
     const ctx = canvasRef.current.getContext('2d');
     // Setup the font style
-    ctx.font = `32px Impact, Charcoal, sans-serif`;
+    ctx.font = `${fontSize}px Impact, Charcoal, sans-serif`;
 
     // Clear canvas and repaint all the things
     ctx.clearRect(0, 0, frameSize.width, frameSize.height);
@@ -28,7 +30,7 @@ export default function BackgroundTextLayer({ textList = [] }) {
       ctx.fillStyle = textData.color;
       ctx.fillText(textData.text, textData.x, textData.y);
     });
-  }, [textList, frameSize]);
+  }, [textList, frameSize, fontSize]);
 
   return (
     <StyledBackgroundTextLayerWrapperDiv>

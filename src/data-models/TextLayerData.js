@@ -17,11 +17,10 @@ function idFromStr(str) {
 }
 
 class TextLayerData {
-  constructor(height, width, textList = [], fontSize = 32) {
+  constructor(height, width, textList = []) {
     this.height = height;
     this.width = width;
     this.textList = textList;
-    this.fontSize = fontSize;
   }
 
   addText(text, x = this.width / 2, y = this.height / 2) {
@@ -43,10 +42,9 @@ class TextLayerData {
 
   getHash() {
     const val = md5(
-      +JSON.stringify(this.height) +
-        JSON.stringify(this.width) +
-        JSON.stringify(this.textList) +
-        JSON.stringify(this.fontSize)
+      JSON.stringify(this.height) +
+      JSON.stringify(this.width) +
+      JSON.stringify(this.textList)
     );
 
     return val;

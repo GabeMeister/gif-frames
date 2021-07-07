@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Redirect
 } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
 import GifSearcher from '../GifSearcher';
-// import GifUploader from '../GifUploader';
-// import RadioTab from '../RadioTab';
+import GifUploader from '../GifUploader';
+import RadioTab from '../RadioTab';
+
+import framesState from '../state/atoms/framesState';
+import selectedTextIdState from '../state/atoms/selectedTextIdState';
 
 export default function HomePage() {
   const [gifUrl, setGifUrl] = useState('');
   const [redirecting, setRedirecting] = useState(false);
+  const setFrames = useSetRecoilState(framesState);
+  const setSelectedTextId = useSetRecoilState(selectedTextIdState);
   // const [fetchLoading, setFetchLoading] = useState(false);
   // const gifUrlRef = useRef(null);
 
@@ -33,10 +39,15 @@ export default function HomePage() {
     setRedirecting(true);
   }
 
-  // function onGifUploaded(file) {
-  //   setGifUrl(URL.createObjectURL(file));
-  //   setRedirecting(true);
-  // }
+  function onGifUploaded(file) {
+    setGifUrl(URL.createObjectURL(file));
+    setRedirecting(true);
+  }
+
+  useEffect(() => {
+    setFrames([]);
+    setSelectedTextId(null);
+  }, [setFrames, setSelectedTextId]);
 
   return (
     <>
@@ -45,8 +56,7 @@ export default function HomePage() {
       ) : (
           <div className="p-6 w-2/3 mr-auto ml-auto text-center">
             <h1 className="text-8xl mt-3 mb-10 headline">Text Gif</h1>
-            <GifSearcher onGifSelected={url => onSearchComplete(url)} />
-            {/* <RadioTab options={[
+            <RadioTab options={[
               {
                 name: 'search',
                 displayName: 'Search',
@@ -54,30 +64,30 @@ export default function HomePage() {
                   <GifSearcher onGifSelected={url => onSearchComplete(url)} />
                 )
               },
-              {
-                name: 'url',
-                displayName: 'Url',
-                content: (
-                  <>
-                    <input
-                      ref={gifUrlRef}
-                      type="text"
-                      value={gifUrl}
-                      onChange={() => setGifUrl(gifUrlRef.current.value)}
-                      className="pb-2 border-b-2 outline-none focus:border-blue-300 mx-auto w-1/3"
-                    />{' '}
-                    <button
-                      onClick={onUrlEntered}
-                      className={`${fetchLoading ? 'disabled:opacity-50 bg-gray-300' : 'bg-blue-300'} ml-3 p-2.5 rounded`}
-                    >
-                      {fetchLoading
-                        ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
-                        : <span>Go</span>
-                      }
-                    </button>
-                  </>
-                )
-              },
+              // {
+              //   name: 'url',
+              //   displayName: 'Url',
+              //   content: (
+              //     <>
+              //       <input
+              //         ref={gifUrlRef}
+              //         type="text"
+              //         value={gifUrl}
+              //         onChange={() => setGifUrl(gifUrlRef.current.value)}
+              //         className="pb-2 border-b-2 outline-none focus:border-blue-300 mx-auto w-1/3"
+              //       />{' '}
+              //       <button
+              //         onClick={onUrlEntered}
+              //         className={`${fetchLoading ? 'disabled:opacity-50 bg-gray-300' : 'bg-blue-300'} ml-3 p-2.5 rounded`}
+              //       >
+              //         {fetchLoading
+              //           ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
+              //           : <span>Go</span>
+              //         }
+              //       </button>
+              //     </>
+              //   )
+              // },
               {
                 name: 'file',
                 displayName: 'File',
@@ -85,7 +95,7 @@ export default function HomePage() {
                   <GifUploader onGifUploaded={file => onGifUploaded(file)} />
                 )
               }
-            ]} /> */}
+            ]} />
           </div>
         )}
     </>
