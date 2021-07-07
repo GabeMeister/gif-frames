@@ -1,11 +1,11 @@
 import React from 'react';
 import { useSetRecoilState } from 'recoil';
 import Slider from 'rc-slider';
-import { Link } from 'react-router-dom';
 import 'rc-slider/assets/index.css';
 
 import StyledSidebarDiv from './styled-components/StyledSidebarDiv';
 import delayState from './state/atoms/delayState';
+import HomeButton from './HomeButton';
 
 const MAX_DELAY = 200;
 
@@ -22,7 +22,7 @@ export default function RenderPageSidebar({ textLayerData }) {
   
   return (
     <StyledSidebarDiv>
-      <Link to="/">← Back to Home</Link>
+      <HomeButton />
       <br />
       <br />
       <br />

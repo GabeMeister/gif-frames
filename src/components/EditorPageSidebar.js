@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import cloneDeep from "lodash.clonedeep";
-import { Link } from 'react-router-dom';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
@@ -12,6 +11,7 @@ import frameIndexState from "./state/atoms/frameIndexState";
 import fontSizeState from "./state/atoms/fontSizeState";
 import Button from "./Button";
 import StyledSidebarDiv from './styled-components/StyledSidebarDiv';
+import HomeButton from './HomeButton';
 
 const AddTextBtn = styled(Button)`
   margin-left: 5px;
@@ -40,7 +40,7 @@ export default function EditorPageSidebar({ textLayerData }) {
   
   return (
     <StyledSidebarDiv>
-      <Link to="/">← Back to Home</Link>
+      <HomeButton />
       <br />
       <br />
       <br />
