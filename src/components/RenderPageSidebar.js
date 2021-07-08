@@ -5,12 +5,12 @@ import 'rc-slider/assets/index.css';
 
 import StyledSidebarDiv from './styled-components/StyledSidebarDiv';
 import delayState from './state/atoms/delayState';
-import HomeButton from './HomeButton';
+import ConfirmLink from './ConfirmLink';
 
 const MAX_DELAY = 200;
 
 // A sidebar that holds all the different texts of the current frame
-export default function RenderPageSidebar({ textLayerData }) {
+export default function RenderPageSidebar() {
   const setDelay = useSetRecoilState(delayState);
 
   function onGifSpeedChange(delay) {
@@ -22,7 +22,7 @@ export default function RenderPageSidebar({ textLayerData }) {
   
   return (
     <StyledSidebarDiv>
-      <HomeButton />
+      <ConfirmLink to='/' text={'← Create new gif'} />
       <br />
       <br />
       <br />

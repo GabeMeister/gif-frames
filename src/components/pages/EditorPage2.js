@@ -167,7 +167,7 @@ export default function EditorPage2() {
               <Button color="BurlyWood" onClick={goToBeginning}>Go to First Frame</Button>
               <br />
               <br />
-              <Button color="lightgreen"><Link to="/render">Render and Preview</Link></Button>
+              <Button color="lightgreen"><Link to="/render">Finish</Link></Button>
             </Controls>
           </>
         )}

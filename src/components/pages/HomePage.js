@@ -90,7 +90,7 @@ export default function HomePage() {
               // },
               {
                 name: 'file',
-                displayName: 'File',
+                displayName: 'Upload',
                 content: (
                   <GifUploader onGifUploaded={file => onGifUploaded(file)} />
                 )

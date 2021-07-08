@@ -11,7 +11,7 @@ import frameIndexState from "./state/atoms/frameIndexState";
 import fontSizeState from "./state/atoms/fontSizeState";
 import Button from "./Button";
 import StyledSidebarDiv from './styled-components/StyledSidebarDiv';
-import HomeButton from './HomeButton';
+import ConfirmLink from './ConfirmLink';
 
 const AddTextBtn = styled(Button)`
   margin-left: 5px;
@@ -40,7 +40,7 @@ export default function EditorPageSidebar({ textLayerData }) {
   
   return (
     <StyledSidebarDiv>
-      <HomeButton />
+      <ConfirmLink to="/" />
       <br />
       <br />
       <br />
