@@ -1,15 +1,14 @@
 import md5 from "md5";
 
 const COLORS = [
-  'red',
-  'blue',
-  'orange',
-  'green',
-  'black',
-  'purple',
-  'gray',
-  'pink',
-  'violet'
+  '#FF4136', // red
+  '#7FDBFF', // blue
+  '#FF851B', // orange
+  '#2ECC40', // green
+  '#F012BE', // pink
+  '#FFDC00', // yellow
+  '#DDDDDD', // silver
+  '#01FF70'  // lime green
 ];
 
 function idFromStr(str) {

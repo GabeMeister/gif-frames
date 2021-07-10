@@ -137,7 +137,7 @@ export default function EditorPage2() {
       onKeyDown={onKeyDown}
     >
       <StyledEditorPageDiv className="yoo">
-        {frames.length !== 0 && (
+        {frames.length !== 0 ? (
           <>
             <EditorSidebar textLayerData={frames[frameIdx].textLayerData} />
             <div>
@@ -170,6 +170,8 @@ export default function EditorPage2() {
               <Button color="lightgreen"><Link to="/render">Finish</Link></Button>
             </Controls>
           </>
+        ) : (
+          <h1>Loading...</h1>
         )}
       </StyledEditorPageDiv>
     </Hotkeys>

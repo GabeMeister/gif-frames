@@ -7,6 +7,7 @@ import Button from "../Button";
 import RenderPageSidebar from '../RenderPageSidebar';
 import delayState from "../state/atoms/delayState";
 import fontSizeState from "../state/atoms/fontSizeState";
+import { drawTextOnCanvas } from "../lib/fonts";
 
 const StyledRenderPageDiv = styled.div`
   width: 1024px;
@@ -38,9 +39,6 @@ export default function RenderPage() {
       currentFrame.height = frames[i].imageLayerData.height;
       const ctx = currentFrame.getContext('2d');
 
-      // Setup the font style
-      ctx.font = `${fontSize}px Impact, Charcoal, sans-serif`;
-
       // Images take a little bit to load, so we have to use promises cause the
       // picture isn't guaranteed to be done loading when we do things
       // synchronously
@@ -52,9 +50,8 @@ export default function RenderPage() {
           ctx.drawImage(img, 0, 0);
 
           // Add text to the canvas
-          frames[i].textLayerData.textList.forEach(t => {
-            ctx.fillStyle = t.color;
-            ctx.fillText(t.text, t.x, t.y);
+          frames[i].textLayerData.textList.forEach(textData => {
+            drawTextOnCanvas(ctx, textData, fontSize);
           });
 
           gif.addFrame(currentFrame, {

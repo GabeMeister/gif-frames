@@ -7,6 +7,8 @@ import fontSizeState from "./state/atoms/fontSizeState";
 import md5 from 'md5';
 import styled from 'styled-components';
 
+import { drawTextOnCanvas } from "./lib/fonts";
+
 const StyledBackgroundTextLayerWrapperDiv = styled.div`
   position: absolute;
   user-select: none;
@@ -19,16 +21,12 @@ export default function BackgroundTextLayer({ textList = [] }) {
 
   useEffect(() => {
     const ctx = canvasRef.current.getContext('2d');
-    // Setup the font style
-    ctx.font = `${fontSize}px Impact, Charcoal, sans-serif`;
-
     // Clear canvas and repaint all the things
     ctx.clearRect(0, 0, frameSize.width, frameSize.height);
 
     // Iterate through the texts and paint them on
     textList.forEach(textData => {
-      ctx.fillStyle = textData.color;
-      ctx.fillText(textData.text, textData.x, textData.y);
+      drawTextOnCanvas(ctx, textData, fontSize);
     });
   }, [textList, frameSize, fontSize]);
 

@@ -10,6 +10,7 @@ import framesState from "./state/atoms/framesState";
 import fontSizeState from "./state/atoms/fontSizeState";
 import frameIndexState from "./state/atoms/frameIndexState";
 import selectedTextIdState from "./state/atoms/selectedTextIdState";
+import { drawTextOnCanvas } from "./lib/fonts";
 
 const StyledDraggableTextLayerWrapperDiv = styled.div`
   position: absolute;
@@ -109,9 +110,7 @@ export default function DraggableTextLayer({ initialTextData }) {
     // Clear all pre-existing text first
     ctx.clearRect(0, 0, frameSize.width, frameSize.height);
 
-    ctx.font = `${fontSize}px Impact, Charcoal, sans-serif`;
-    ctx.fillStyle = textData.color;
-    ctx.fillText(textData.text, textData.x, textData.y);
+    drawTextOnCanvas(ctx, textData, fontSize);
 
     // Need to calculate the text width based off of the canvas context
     const canvasText = cloneDeep(textData);
@@ -126,7 +125,7 @@ export default function DraggableTextLayer({ initialTextData }) {
     ctx.setLineDash([6]);
     ctx.strokeStyle = "gray";
     ctx.lineWidth = "2";
-    const padding = 10;
+    const padding = 20;
     ctx.rect(canvasText.x - padding, canvasText.y - canvasText.height - padding, canvasText.width + (padding*2), canvasText.height + (padding*2));
     ctx.stroke();
   }, [textData, frameSize, setCanvasTextData, fontSize]);
