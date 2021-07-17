@@ -16,8 +16,8 @@ export default function RenderPageSidebar() {
   function onGifSpeedChange(delay) {
     // Because a larger delay means the gif will be slower, we have to reverse
     // the amount the user chose to make it seem like a bigger value in the
-    // slide will seem like a "faster" play speed.
-    setDelay(MAX_DELAY - delay);
+    // slide will seem like a "faster" play speed. At LEAST make it 20 tho
+    setDelay(Math.max(MAX_DELAY - delay, 20));
   }
   
   return (

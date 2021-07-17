@@ -27,8 +27,8 @@ export default function RenderPage() {
 
   const renderGif = useCallback(() => {
     var gif = new window.GIF({
-      workers: 2,
-      quality: 10
+      workers: 10,
+      quality: 100
     });
 
     let renderTasks = [];
