@@ -46,7 +46,6 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
 
   function onMouseUp(e) {
     setIsTextSelected(false);
-    console.log(PositionBuffer.x, PositionBuffer.y);
     let newFrames = renderText(frames, frameIdx, selectedTextId, PositionBuffer.x, PositionBuffer.y);
     setFrames(newFrames);
   }

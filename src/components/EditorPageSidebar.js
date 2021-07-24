@@ -80,7 +80,6 @@ export default function EditorPageSidebar() {
     framesCpy.forEach(frame => {
       frame.deleteTextPlacement(textIdToDelete);
     });
-    console.log('***** framesCpy *****', framesCpy);
 
     setFrames(framesCpy);
 
