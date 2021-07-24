@@ -10,7 +10,9 @@ import framesState from "./state/atoms/framesState";
 import fontSizeState from "./state/atoms/fontSizeState";
 import frameIndexState from "./state/atoms/frameIndexState";
 import selectedTextIdState from "./state/atoms/selectedTextIdState";
+import isTextSelectedState from "./state/atoms/isTextSelectedState";
 import { drawTextOnCanvas } from "./lib/fonts";
+import { getMousePos, isCursorPositionOverText } from "./lib/mouseEvents";
 
 const StyledDraggableTextLayerWrapperDiv = styled.div`
   position: absolute;
@@ -22,87 +24,58 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
   const frameSize = useRecoilValue(frameSizeState);
   const fontSize = useRecoilValue(fontSizeState);
   const frameIdx = useRecoilValue(frameIndexState);
-  const selectedTextId = useRecoilValue(selectedTextIdState);
-  const [mouseDown, setMouseDown] = useState(false);
-  const [isTextClicked, setIsTextClicked] = useState(false);
+  const [selectedTextId, setSelectedTextId] = useRecoilState(selectedTextIdState);
+  const [isTextSelected, setIsTextSelected] = useRecoilState(isTextSelectedState);
   const [textPlacement, setTextPlacement] = useState(initialTextPlacement);
   const [frames, setFrames] = useRecoilState(framesState);
   const [cursorPos, setCursorPos] = useState({ x: -1, y: -1 });
 
-  function isCursorPositionOverText(textPlacement, x, y) {
-    const ctx = canvasRef.current.getContext('2d');
-    
-    return (
-      x >= textPlacement.x
-      && x <= (textPlacement.x + textPlacement.getWidth(ctx))
-      && (y >= textPlacement.y - textPlacement.getHeight(ctx))
-      && y <= textPlacement.y
-    );
-  }
-
   function onMouseDown(e) {
-    setMouseDown(true);
-
     const pos = getMousePos(canvasRef.current, e);
+    const ctx = canvasRef.current.getContext('2d');
 
-    if (isCursorPositionOverText(textPlacement, pos.x, pos.y)) {
+    if (isCursorPositionOverText(ctx, textPlacement, pos.x, pos.y)) {
       setCursorPos(pos);
-      setIsTextClicked(true);
+      setIsTextSelected(true);
+
+      // Also need to store the new x and y to the position buffer
+      PositionBuffer.x = textPlacement.x;
+      PositionBuffer.y = textPlacement.y;
     }
   }
 
   function onMouseUp(e) {
-    setMouseDown(false);
-    setIsTextClicked(false);
-
+    setIsTextSelected(false);
+    console.log(PositionBuffer.x, PositionBuffer.y);
     let newFrames = renderText(frames, frameIdx, selectedTextId, PositionBuffer.x, PositionBuffer.y);
     setFrames(newFrames);
   }
 
   function onMouseMove(e) {
-    const currentCursorPos = getMousePos(canvasRef.current, e);
+    const pos = getMousePos(canvasRef.current, e);
+    const ctx = canvasRef.current.getContext('2d');
 
-    if (mouseDown) {
+    if (isTextSelected) {
       let textPlacementCpy = cloneDeep(textPlacement);
 
       // Figure out the difference in how much the cursor has moved from last time
-      const xChange = currentCursorPos.x - cursorPos.x;
-      const yChange = currentCursorPos.y - cursorPos.y;
+      const xChange = pos.x - cursorPos.x;
+      const yChange = pos.y - cursorPos.y;
 
       textPlacementCpy.x += xChange;
       textPlacementCpy.y += yChange;
 
       setTextPlacement(textPlacementCpy);
-      setCursorPos(currentCursorPos);
+      setCursorPos(pos);
 
       // Also need to store the new x and y to the position buffer
       PositionBuffer.x = textPlacementCpy.x;
       PositionBuffer.y = textPlacementCpy.y;
     }
-
-    handleCursorStyling(currentCursorPos);
-  }
-
-  function handleCursorStyling(pos) {
-    if (isTextClicked || isCursorPositionOverText(textPlacement, pos.x, pos.y)) {
-      if (mouseDown) {
-        canvasRef.current.style.cursor = 'grabbing';
-      }
-      else {
-        canvasRef.current.style.cursor = 'grab';
-      }
+    else if(!isCursorPositionOverText(ctx, textPlacement, pos.x, pos.y)) {
+      // The user hovered away from the text
+      setSelectedTextId(null);
     }
-    else {
-      canvasRef.current.style.cursor = 'default';
-    }
-  }
-
-  function getMousePos(canvas, evt) {
-    var rect = canvas.getBoundingClientRect();
-    return {
-      x: evt.clientX - rect.left,
-      y: evt.clientY - rect.top
-    };
   }
 
   useEffect(() => {
@@ -128,6 +101,15 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
     );
     ctx.stroke();
   }, [textPlacement, frameSize, fontSize]);
+
+  useEffect(() => {
+    if (isTextSelected) {
+      canvasRef.current.style.cursor = 'grabbing';
+    }
+    else {
+      canvasRef.current.style.cursor = 'grab';
+    }
+  }, [isTextSelected, canvasRef]);
   
   return (
     <StyledDraggableTextLayerWrapperDiv>

@@ -38,7 +38,7 @@ export default function EditorPage() {
   const setFrameSize = useSetRecoilState(frameSizeState);
   const [selectedTextId, setSelectedTextId] = useRecoilState(selectedTextIdState);
 
-  const textListWithoutSelectedText = frames[frameIdx]?.getTextListWithout([selectedTextId]);
+  const backgroundTextList = getBackgroundText();
 
   // Retrieve the gifUrl query param
   let query = useQuery();
@@ -92,6 +92,15 @@ export default function EditorPage() {
     return framesCpy;
   }
 
+  function getBackgroundText() {
+    if(selectedTextId) {
+      return frames[frameIdx]?.getTextListWithout([selectedTextId]);
+    }
+    else {
+      return frames[frameIdx]?.getTextList();
+    }
+  }
+
   const initialize = useCallback(() => {
     // If we don't have a gif url don't do anything, we're about to redirect
     // back to the home page anyway
@@ -136,9 +145,9 @@ export default function EditorPage() {
               <ImageLayer
                 imageLayerData={frames[frameIdx].imageLayerData}
               />
-              {textListWithoutSelectedText.length !== 0 && (
+              {backgroundTextList.length !== 0 && (
                 <BackgroundTextLayer
-                  textPlacements={textListWithoutSelectedText}
+                  textPlacements={backgroundTextList}
                 />
               )}
               {selectedTextId && (

@@ -64,7 +64,6 @@ export default function EditorPageSidebar() {
     framesCpy[frameIdx].addTextPlacement(newText.id);
     
     setFrames(framesCpy);
-    setSelectedTextId(newText.id);
   }
 
   function onFontSizeChange(fontSize) {
@@ -122,14 +121,15 @@ export default function EditorPageSidebar() {
                 value={text.id}
                 checked={text.id === selectedTextId}
                 onChange={evt => {
-                  // Sometimes the user doesn't want any text selected, so allow for
-                  // unchecking
-                  if(selectedTextId === evt.target.value) {
-                    setSelectedTextId(null);
-                  }
-                  else {
-                    setSelectedTextId(evt.target.value);
-                  }
+                  // Commented out for now because this will soon be for when the user wants to hide text on certain frames
+                  // // Sometimes the user doesn't want any text selected, so allow for
+                  // // unchecking
+                  // if(selectedTextId === evt.target.value) {
+                  //   setSelectedTextId(null);
+                  // }
+                  // else {
+                  //   setSelectedTextId(evt.target.value);
+                  // }
                 }}
               />
               <TextLabel htmlFor={text.id}>{text.text}</TextLabel><br />
