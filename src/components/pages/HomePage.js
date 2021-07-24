@@ -3,6 +3,7 @@ import {
   Redirect
 } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
+import TextManager from '../../data-models/TextManager';
 import GifSearcher from '../GifSearcher';
 import GifUploader from '../GifUploader';
 import RadioTab from '../RadioTab';
@@ -47,6 +48,7 @@ export default function HomePage() {
   useEffect(() => {
     setFrames([]);
     setSelectedTextId(null);
+    TextManager.deleteAll();
   }, [setFrames, setSelectedTextId]);
 
   return (

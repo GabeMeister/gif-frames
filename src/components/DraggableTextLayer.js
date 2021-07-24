@@ -17,7 +17,7 @@ const StyledDraggableTextLayerWrapperDiv = styled.div`
   user-select: none;
 `;
 
-export default function DraggableTextLayer({ initialTextData }) {
+export default function DraggableTextLayer({ initialTextPlacement }) {
   const canvasRef = useRef();
   const frameSize = useRecoilValue(frameSizeState);
   const fontSize = useRecoilValue(fontSizeState);
@@ -25,17 +25,18 @@ export default function DraggableTextLayer({ initialTextData }) {
   const selectedTextId = useRecoilValue(selectedTextIdState);
   const [mouseDown, setMouseDown] = useState(false);
   const [isTextClicked, setIsTextClicked] = useState(false);
-  const [textData, setTextData] = useState(initialTextData);
-  const [canvasTextData, setCanvasTextData] = useState({});
+  const [textPlacement, setTextPlacement] = useState(initialTextPlacement);
   const [frames, setFrames] = useRecoilState(framesState);
   const [cursorPos, setCursorPos] = useState({ x: -1, y: -1 });
 
-  function isCursorPositionOverText(text, x, y) {
+  function isCursorPositionOverText(textPlacement, x, y) {
+    const ctx = canvasRef.current.getContext('2d');
+    
     return (
-      x >= text.x
-      && x <= (text.x + text.width)
-      && (y >= text.y - text.height)
-      && y <= text.y
+      x >= textPlacement.x
+      && x <= (textPlacement.x + textPlacement.getWidth(ctx))
+      && (y >= textPlacement.y - textPlacement.getHeight(ctx))
+      && y <= textPlacement.y
     );
   }
 
@@ -44,7 +45,7 @@ export default function DraggableTextLayer({ initialTextData }) {
 
     const pos = getMousePos(canvasRef.current, e);
 
-    if (isCursorPositionOverText(canvasTextData, pos.x, pos.y)) {
+    if (isCursorPositionOverText(textPlacement, pos.x, pos.y)) {
       setCursorPos(pos);
       setIsTextClicked(true);
     }
@@ -62,28 +63,28 @@ export default function DraggableTextLayer({ initialTextData }) {
     const currentCursorPos = getMousePos(canvasRef.current, e);
 
     if (mouseDown) {
-      let textDataCpy = cloneDeep(textData);
+      let textPlacementCpy = cloneDeep(textPlacement);
 
       // Figure out the difference in how much the cursor has moved from last time
       const xChange = currentCursorPos.x - cursorPos.x;
       const yChange = currentCursorPos.y - cursorPos.y;
 
-      textDataCpy.x += xChange;
-      textDataCpy.y += yChange;
+      textPlacementCpy.x += xChange;
+      textPlacementCpy.y += yChange;
 
-      setTextData(textDataCpy);
+      setTextPlacement(textPlacementCpy);
       setCursorPos(currentCursorPos);
 
       // Also need to store the new x and y to the position buffer
-      PositionBuffer.x = textDataCpy.x;
-      PositionBuffer.y = textDataCpy.y;
+      PositionBuffer.x = textPlacementCpy.x;
+      PositionBuffer.y = textPlacementCpy.y;
     }
 
     handleCursorStyling(currentCursorPos);
   }
 
   function handleCursorStyling(pos) {
-    if (isTextClicked || isCursorPositionOverText(canvasTextData, pos.x, pos.y)) {
+    if (isTextClicked || isCursorPositionOverText(textPlacement, pos.x, pos.y)) {
       if (mouseDown) {
         canvasRef.current.style.cursor = 'grabbing';
       }
@@ -105,35 +106,33 @@ export default function DraggableTextLayer({ initialTextData }) {
   }
 
   useEffect(() => {
-    const ctx = canvasRef.current.getContext("2d");
+    const ctx = canvasRef.current.getContext('2d');
 
     // Clear all pre-existing text first
     ctx.clearRect(0, 0, frameSize.width, frameSize.height);
 
-    drawTextOnCanvas(ctx, textData, fontSize);
+    drawTextOnCanvas(ctx, textPlacement, fontSize);
 
-    // Need to calculate the text width based off of the canvas context
-    const canvasText = cloneDeep(textData);
-    const textMetrics = ctx.measureText(textData.text);
-    canvasText.width = textMetrics.width;
-    canvasText.height = textMetrics.fontBoundingBoxAscent - textMetrics.fontBoundingBoxDescent;
-    setCanvasTextData(canvasText);
-    
     // Put a nice little box as a visual indicator around the text you can
     // actually drag around
     ctx.beginPath();
     ctx.setLineDash([6]);
-    ctx.strokeStyle = "gray";
-    ctx.lineWidth = "2";
-    const padding = 20;
-    ctx.rect(canvasText.x - padding, canvasText.y - canvasText.height - padding, canvasText.width + (padding*2), canvasText.height + (padding*2));
+    ctx.strokeStyle = 'gray';
+    ctx.lineWidth = '2';
+    const padding = 10;
+    ctx.rect(
+      textPlacement.x - padding,
+      textPlacement.y - textPlacement.getHeight(ctx) - padding,
+      textPlacement.getWidth(ctx) + (padding*2),
+      textPlacement.getHeight(ctx) + (padding*2)
+    );
     ctx.stroke();
-  }, [textData, frameSize, setCanvasTextData, fontSize]);
-
+  }, [textPlacement, frameSize, fontSize]);
+  
   return (
     <StyledDraggableTextLayerWrapperDiv>
       <canvas
-        id={textData.id}
+        id={textPlacement.textId}
         ref={canvasRef}
         height={frameSize.height}
         width={frameSize.width}

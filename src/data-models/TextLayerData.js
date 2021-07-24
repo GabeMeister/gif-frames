@@ -1,49 +1,41 @@
 import md5 from "md5";
-
-const COLORS = [
-  '#FF4136', // red
-  '#7FDBFF', // blue
-  '#FF851B', // orange
-  '#2ECC40', // green
-  '#F012BE', // pink
-  '#FFDC00', // yellow
-  '#DDDDDD', // silver
-  '#01FF70'  // lime green
-];
-
-function idFromStr(str) {
-  return str.replace(/\s+/g, '-').toLowerCase();
-}
+import TextPlacement from "./TextPlacement";
 
 class TextLayerData {
-  constructor(height, width, textList = []) {
+  constructor(height, width, textPlacements = []) {
     this.height = height;
     this.width = width;
-    this.textList = textList;
+    this.textPlacements = textPlacements;
   }
 
-  addText(text, x = this.width / 2, y = this.height / 2) {
-    if(this.textList.length > COLORS.length) {
-      throw new Error('Too many texts added, not enough colors to support');
-    }
-    
-    const id = md5(idFromStr(text));
-    this.textList.push({
-      id,
-      text,
-      x: this.width / 2,
-      y: this.height / 2,
-      color: COLORS[this.textList.length]
-    });
+  addTextPlacement(textId) {
+    this.textPlacements.push(new TextPlacement(textId, this.width / 2, this.height / 2));
+  }
 
-    return id;
+  getTextPlacement(textId) {
+    return this.textPlacements.find(t => t.textId === textId);
+  }
+
+  deleteTextPlacement(textId) {
+    this.textPlacements = this.textPlacements.filter(t => t.textId !== textId);
+  }
+
+  getTextListWithout(excludedTextIds) {
+    let final = [];
+    for(let i = 0; i < this.textPlacements.length; i++) {
+      if(!excludedTextIds.includes(this.textPlacements[i].textId)) {
+        final.push(this.textPlacements[i]);
+      }
+    }
+
+    return final;
   }
 
   getHash() {
     const val = md5(
       JSON.stringify(this.height) +
       JSON.stringify(this.width) +
-      JSON.stringify(this.textList)
+      JSON.stringify(this.canvasTextList)
     );
 
     return val;

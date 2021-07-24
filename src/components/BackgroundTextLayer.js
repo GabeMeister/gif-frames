@@ -14,7 +14,7 @@ const StyledBackgroundTextLayerWrapperDiv = styled.div`
   user-select: none;
 `;
 
-export default function BackgroundTextLayer({ textList = [] }) {
+export default function BackgroundTextLayer({ textPlacements = [] }) {
   const canvasRef = useRef(null);
   const frameSize = useRecoilValue(frameSizeState);
   const fontSize = useRecoilValue(fontSizeState);
@@ -25,15 +25,15 @@ export default function BackgroundTextLayer({ textList = [] }) {
     ctx.clearRect(0, 0, frameSize.width, frameSize.height);
 
     // Iterate through the texts and paint them on
-    textList.forEach(textData => {
-      drawTextOnCanvas(ctx, textData, fontSize);
+    textPlacements.forEach(textPlacement => {
+      drawTextOnCanvas(ctx, textPlacement, fontSize);
     });
-  }, [textList, frameSize, fontSize]);
+  }, [textPlacements, frameSize, fontSize]);
 
   return (
     <StyledBackgroundTextLayerWrapperDiv>
       <canvas
-        id={md5(JSON.stringify(textList.map(textData => textData.text)))}
+        id={md5(JSON.stringify(textPlacements.map(textPlacement => textPlacement.getLinkedTextId())))}
         ref={canvasRef}
         height={frameSize.height}
         width={frameSize.width}

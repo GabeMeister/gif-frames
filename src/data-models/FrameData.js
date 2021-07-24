@@ -9,6 +9,10 @@ class FrameData {
     this.textLayerData = TextLayerData.initFromCanvas(canvas);
   }
 
+  addTextPlacement(textId) {
+    this.textLayerData.addTextPlacement(textId);
+  }
+
   getHash() {
     const val = md5(
       JSON.stringify(this.imageLayerData.getHash())
@@ -16,7 +20,28 @@ class FrameData {
     );
 
     return val;
-  };
+  }
+
+  getTextPlacement(textId) {
+    return this.textLayerData.getTextPlacement(textId);
+  }
+
+  hasTextPlacement(textId) {
+    return !!this.getTextPlacement(textId);
+  }
+
+  deleteTextPlacement(textId) {
+    this.textLayerData.deleteTextPlacement(textId);
+  }
+
+  // Get the list of all texts, optionally exclude specified texts by id
+  getTextList() {
+    return this.textLayerData.textPlacements;
+  }
+
+  getTextListWithout(excludedTextIds) {
+    return this.textLayerData.getTextListWithout(excludedTextIds);
+  }
 }
 
 export default FrameData;

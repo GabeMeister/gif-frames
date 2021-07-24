@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import cloneDeep from "lodash.clonedeep";
@@ -7,13 +7,13 @@ import gifFrames from "gif-frames";
 import Hotkeys from "react-hot-keys";
 import { Link } from 'react-router-dom';
 
-import EditorSidebar from "../EditorPageSidebar";
+import EditorPageSidebar from "../EditorPageSidebar";
 import Button from "../Button";
 import FrameData from "../../data-models/FrameData";
-import framesState from "../../components/state/atoms/framesState";
-import frameIndexState from "../../components/state/atoms/frameIndexState";
-import frameSizeState from "../../components/state/atoms/frameSizeState";
-import selectedTextIdState from "../../components/state/atoms/selectedTextIdState";
+import framesState from "../state/atoms/framesState";
+import frameIndexState from "../state/atoms/frameIndexState";
+import frameSizeState from "../state/atoms/frameSizeState";
+import selectedTextIdState from "../state/atoms/selectedTextIdState";
 import ImageLayer from "../ImageLayer";
 import DraggableTextLayer from "../DraggableTextLayer";
 import BackgroundTextLayer from "../BackgroundTextLayer";
@@ -32,17 +32,17 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-export default function EditorPage2() {
+export default function EditorPage() {
   const [frames, setFrames] = useRecoilState(framesState);
   const [frameIdx, setFrameIdx] = useRecoilState(frameIndexState);
   const setFrameSize = useSetRecoilState(frameSizeState);
   const [selectedTextId, setSelectedTextId] = useRecoilState(selectedTextIdState);
-  
-  const textListWithoutSelectedText = frames[frameIdx]?.textLayerData?.textList?.filter(textData => textData.id !== selectedTextId);
+
+  const textListWithoutSelectedText = frames[frameIdx]?.getTextListWithout([selectedTextId]);
 
   // Retrieve the gifUrl query param
   let query = useQuery();
-  const gifUrl = query.get("gifUrl");
+  const gifUrl = query.get('gifUrl');
 
   function onNextFrame() {
     if(frameIdx < frames.length - 1) {
@@ -60,19 +60,13 @@ export default function EditorPage2() {
     }
   }
 
-  function onKeyDown(keyName, e, handle) {
-    onNextFrame();
-  }
-
   function goToBeginning() {
     // Have to "render" the text onto the current frame
     let newFrames = renderText(frames);
 
     // Save the new frames data
     setFrames(newFrames);
-
     setFrameIdx(0);
-
     setSelectedTextId(null);
   }
 
@@ -83,28 +77,22 @@ export default function EditorPage2() {
     }
 
     let framesCpy = cloneDeep(currentFrames);
-    let currentSelectedText = framesCpy[frameIdx]
-      .textLayerData
-      .textList
-      .find(textData => textData.id === selectedTextId);
-    let nextFrameTextLayerData = framesCpy[frameIdx + 1].textLayerData;
-    let nextFrameTextList = nextFrameTextLayerData.textList;
-    const nextSelectedText = nextFrameTextList.find(textData => textData.id === selectedTextId);
+    let nextFrame = framesCpy[frameIdx + 1];
 
-    if(!nextFrameTextList.find(textData => textData.id === selectedTextId)){
+    if(!nextFrame.hasTextPlacement(selectedTextId)){
       // We have to create a new text object in the new frame because it doesn't exist yet
-      nextFrameTextLayerData.addText(currentSelectedText.text, PositionBuffer.x, PositionBuffer.y);
+      nextFrame.addTextPlacement(selectedTextId);
     }
-    // Stomp the text in the next frame
     else {
-      nextSelectedText.x = PositionBuffer.x;
-      nextSelectedText.y = PositionBuffer.y;
+      // Update the text position in the next frame
+      nextFrame.getTextPlacement(selectedTextId).x = PositionBuffer.x;
+      nextFrame.getTextPlacement(selectedTextId).y = PositionBuffer.y;
     }
 
     return framesCpy;
   }
 
-  useEffect(() => {
+  const initialize = useCallback(() => {
     // If we don't have a gif url don't do anything, we're about to redirect
     // back to the home page anyway
     if (!gifUrl) {
@@ -113,8 +101,8 @@ export default function EditorPage2() {
 
     gifFrames({
       url: gifUrl,
-      frames: "all",
-      outputType: "canvas",
+      frames: 'all',
+      outputType: 'canvas',
       cumulative: true,
     }).then((frames) => {
       const extractedFrames = frames.map((frame) => {
@@ -131,28 +119,32 @@ export default function EditorPage2() {
     });
   }, [gifUrl, setFrames, setFrameIdx, setFrameSize]);
 
+  useEffect(() => {
+    initialize();
+  }, [gifUrl, setFrames, setFrameIdx, setFrameSize, initialize]);
+  
   return (
     <Hotkeys
       keyName="enter"
-      onKeyDown={onKeyDown}
+      onKeyDown={onNextFrame}
     >
-      <StyledEditorPageDiv className="yoo">
+      <StyledEditorPageDiv>
         {frames.length !== 0 ? (
           <>
-            <EditorSidebar textLayerData={frames[frameIdx].textLayerData} />
+            <EditorPageSidebar textLayerData={frames[frameIdx].textLayerData} />
             <div>
               <ImageLayer
                 imageLayerData={frames[frameIdx].imageLayerData}
               />
               {textListWithoutSelectedText.length !== 0 && (
                 <BackgroundTextLayer
-                  textList={textListWithoutSelectedText}
+                  textPlacements={textListWithoutSelectedText}
                 />
               )}
               {selectedTextId && (
                 <DraggableTextLayer
                   key={selectedTextId}
-                  initialTextData={frames[frameIdx].textLayerData.textList.find(textData => textData.id === selectedTextId)}
+                  initialTextPlacement={frames[frameIdx].getTextPlacement(selectedTextId)}
                 />
               )}
             </div>

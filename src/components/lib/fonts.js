@@ -1,9 +1,9 @@
-export function drawTextOnCanvas(ctx, textData, fontSize) {
+export function drawTextOnCanvas(ctx, textPlacement, fontSize) {
   ctx.font = `bold ${fontSize}px sans-serif`;
-  ctx.fillStyle = textData.color;
+  ctx.fillStyle = textPlacement.getLinkedTextColor();
   ctx.shadowOffsetX = 3;
   ctx.shadowOffsetY = 3;
   ctx.shadowColor = 'black';
   ctx.shadowBlur = 7;
-  ctx.fillText(textData.text, textData.x, textData.y);
+  ctx.fillText(textPlacement.getLinkedTextValue(), textPlacement.x, textPlacement.y);
 }
