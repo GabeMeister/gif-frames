@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import cloneDeep from "lodash.clonedeep";
@@ -20,6 +20,8 @@ import BackgroundTextLayer from "../BackgroundTextLayer";
 import Controls from "../Controls";
 import PositionBuffer from "../../data-models/PositionBuffer";
 import { renderText } from "../lib/frames";
+// import useInterval from "../lib/useInterval";
+import useCountdownTimer from "../lib/useCountdownTimer";
 
 const StyledEditorPageDiv = styled.div`
   width: 1024px;
@@ -37,6 +39,7 @@ export default function EditorPage() {
   const [frameIdx, setFrameIdx] = useRecoilState(frameIndexState);
   const setFrameSize = useSetRecoilState(frameSizeState);
   const [selectedTextId, setSelectedTextId] = useRecoilState(selectedTextIdState);
+  const [isAutoplaying, setIsAutoplaying] = useState(false);
 
   const backgroundTextList = getBackgroundText();
 
@@ -101,6 +104,32 @@ export default function EditorPage() {
     }
   }
 
+  function handleKeydown(keyName, e, handle) {
+    e.preventDefault();
+    
+    switch(keyName) {
+      case 'enter':
+        onNextFrame();
+        break;
+      case 'space':
+        if(isAutoplaying) {
+          stop();
+          setIsAutoplaying(false);
+        }
+        else {
+          restart();
+          setIsAutoplaying(true);
+        }
+        break;
+      case 'left':
+        goToBeginning();
+        break;
+      default:
+        // Do nothing
+        break;
+    }
+  }
+
   const initialize = useCallback(() => {
     // If we don't have a gif url don't do anything, we're about to redirect
     // back to the home page anyway
@@ -131,11 +160,31 @@ export default function EditorPage() {
   useEffect(() => {
     initialize();
   }, [gifUrl, setFrames, setFrameIdx, setFrameSize, initialize]);
+
+  const { 
+    restart,
+    stop,
+    number
+  } = useCountdownTimer({
+    millisecondsPerStep: 200,
+    startingNumber: 3,
+    onFinish: () => {
+      onNextFrame();
+      
+      if(frameIdx === frames.length - 1) {
+        stop();
+        setIsAutoplaying(false);
+      }
+      else {
+        restart();
+      }
+    }
+  });
   
   return (
     <Hotkeys
-      keyName="enter"
-      onKeyDown={onNextFrame}
+      keyName="enter,space,left"
+      onKeyDown={handleKeydown}
     >
       <StyledEditorPageDiv>
         {frames.length !== 0 ? (
@@ -169,6 +218,11 @@ export default function EditorPage() {
               <br />
               <br />
               <Button color="lightgreen"><Link to="/render">Finish</Link></Button>
+              <br />
+              <br />
+              {isAutoplaying && (
+                <h1>Autoplay Timer: {number}</h1>
+              )}
             </Controls>
           </>
         ) : (

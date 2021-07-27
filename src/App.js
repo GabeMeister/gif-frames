@@ -10,6 +10,7 @@ import './reset.css';
 import './App.css';
 import EditorPage from './components/pages/EditorPage';
 import RenderPage from './components/pages/RenderPage';
+import TestPage from './components/pages/TestPage';
 import HomePage from './components/pages/HomePage';
 
 window.$ = $;
@@ -25,6 +26,9 @@ function App() {
             </Route>
             <Route path='/render'>
               <RenderPage />
+            </Route>
+            <Route path='/test'>
+              <TestPage />
             </Route>
             <Route path="/">
               <HomePage />

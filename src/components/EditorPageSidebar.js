@@ -40,6 +40,10 @@ const DeleteBtn = styled.button`
   color: #FF4136;
 `;
 
+const TextInputForm = styled.form`
+  display: flex;
+`;
+
 // A sidebar that holds all the different texts of the current frame
 export default function EditorPageSidebar() {
   const textRef = useRef();
@@ -105,8 +109,13 @@ export default function EditorPageSidebar() {
         onChange={onFontSizeChange}
       />
       <br />
-      <input type="text" ref={textRef} />
-      <AddTextBtn onClick={() => addTextToFrame(textRef.current.value)}>Add</AddTextBtn>
+      <TextInputForm onSubmit={evt => {
+        evt.preventDefault();
+        addTextToFrame(textRef.current.value);
+      }}>
+        <input type="text" ref={textRef} />
+        <AddTextBtn onClick={() => addTextToFrame(textRef.current.value)}>Add</AddTextBtn>
+      </TextInputForm>
       <br />
       <br />
       <ul>
