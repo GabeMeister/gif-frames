@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   useRecoilValue,
   useSetRecoilState
@@ -19,6 +19,7 @@ const StyledBackgroundTextLayerWrapperDiv = styled.div`
 
 export default function BackgroundTextLayer({ textPlacements = [] }) {
   const canvasRef = useRef(null);
+  const [isAbleToSelectText, setIsAbleToSelectText] = useState(true);
   const frameSize = useRecoilValue(frameSizeState);
   const fontSize = useRecoilValue(fontSizeState);
   const isTextSelected = useRecoilValue(isTextSelectedState);
@@ -27,6 +28,12 @@ export default function BackgroundTextLayer({ textPlacements = [] }) {
   function onMouseMove(e) {
     const pos = getMousePos(canvasRef.current, e);
     const ctx = canvasRef.current.getContext('2d');
+
+    // Only allow user to select a text when he/she moves the mouse into the
+    // boundaries of a text when not clicking
+    if(!isAbleToSelectText) {
+      return;
+    }
 
     // We only care if the user isn't already currently dragging around text
     if (!isTextSelected) {
@@ -44,6 +51,17 @@ export default function BackgroundTextLayer({ textPlacements = [] }) {
         setSelectedTextId(null);
       }
     }
+  }
+
+  function onMouseUp() {
+    setIsAbleToSelectText(true);
+  }
+
+  function onMouseDown() {
+    // We only allow the user to hover with the mouse up on a piece of text.
+    // Weirdness happens when the user clicks outside of a text, then drags
+    // "into" a text, and then mouses up and moves the mouse again
+    setIsAbleToSelectText(false);
   }
 
   useEffect(() => {
@@ -68,6 +86,8 @@ export default function BackgroundTextLayer({ textPlacements = [] }) {
         width={frameSize.width}
         className="js-frame-canvas"
         onMouseMove={onMouseMove}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
       />
     </StyledBackgroundTextLayerWrapperDiv>
   );
