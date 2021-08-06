@@ -5,26 +5,45 @@ class TextLayerData {
   constructor(height, width, textPlacements = []) {
     this.height = height;
     this.width = width;
-    this.textPlacements = textPlacements;
+    this._textPlacements = textPlacements;
   }
 
   addTextPlacement(textId) {
-    this.textPlacements.push(new TextPlacement(textId, this.width / 2, this.height / 2));
+    this._textPlacements.push(new TextPlacement(textId, this.width / 2, this.height / 2));
   }
 
   getTextPlacement(textId) {
-    return this.textPlacements.find(t => t.textId === textId);
+    return this._textPlacements.find(t => t.textId === textId);
+  }
+
+  getTextPlacements() {
+    return this._textPlacements;
+  }
+
+  getVisibleTextPlacements() {
+    return this._textPlacements.filter(t => t.isVisible);
   }
 
   deleteTextPlacement(textId) {
-    this.textPlacements = this.textPlacements.filter(t => t.textId !== textId);
+    this._textPlacements = this._textPlacements.filter(t => t.textId !== textId);
   }
 
-  getTextListWithout(excludedTextIds) {
+  getTextPlacementsWithout(excludedTextIds) {
     let final = [];
-    for(let i = 0; i < this.textPlacements.length; i++) {
-      if(!excludedTextIds.includes(this.textPlacements[i].textId)) {
-        final.push(this.textPlacements[i]);
+    for(let i = 0; i < this._textPlacements.length; i++) {
+      if(!excludedTextIds.includes(this._textPlacements[i].textId)) {
+        final.push(this._textPlacements[i]);
+      }
+    }
+
+    return final;
+  }
+
+  getVisibleTextPlacementsWithout(excludedTextIds) {
+    let final = [];
+    for(let i = 0; i < this._textPlacements.length; i++) {
+      if(!excludedTextIds.includes(this._textPlacements[i].textId) && this._textPlacements[i].isVisible) {
+        final.push(this._textPlacements[i]);
       }
     }
 

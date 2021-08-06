@@ -6,6 +6,7 @@ import 'rc-slider/assets/index.css';
 import StyledSidebarDiv from './styled-components/StyledSidebarDiv';
 import delayState from './state/atoms/delayState';
 import ConfirmLink from './ConfirmLink';
+import Link from './Link';
 
 const MAX_DELAY = 200;
 
@@ -23,6 +24,9 @@ export default function RenderPageSidebar() {
   return (
     <StyledSidebarDiv>
       <ConfirmLink to='/' text={'← Create new gif'} />
+      <br />
+      <br />
+      <Link to='/editor' text={'← Back to Editing'} />
       <br />
       <br />
       <br />

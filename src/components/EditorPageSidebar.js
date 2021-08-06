@@ -52,20 +52,33 @@ export default function EditorPageSidebar() {
   const setFontSize = useSetRecoilState(fontSizeState);
   const frameIdx = useRecoilValue(frameIndexState);
 
-  function addTextToFrame(text) {
+  function addTextToFrames(text) {
     if(text === '') {
       return;
     }
     
-    let framesCpy = cloneDeep(frames);
-
     // Create the new "global" text (that all frames will know about)
     const newText = TextManager.createText(text);
+
+    // Reset the text input back to nothing
     textRef.current.value = '';
 
+    let framesCpy = cloneDeep(frames);
+    
     // Create the new text "placement" for this frame in particular (the thing
     // that keeps track of where a particular piece of text is in the frame)
     framesCpy[frameIdx].addTextPlacement(newText.id);
+    framesCpy[frameIdx].setTextPlacementVisibility(newText.id, true);
+    
+    // // Create the new text "placement" for all frames
+    // framesCpy.forEach(frame => {
+    //   frame.addTextPlacement(newText.id);
+    // });
+
+    // // Make it visible from current frame onwards
+    // for(let i = frameIdx; i < framesCpy.length; i++) {
+    //   framesCpy[i].setTextPlacementVisibility(newText.id, true);
+    // }
     
     setFrames(framesCpy);
   }
@@ -82,7 +95,7 @@ export default function EditorPageSidebar() {
     let framesCpy = cloneDeep(frames);
 
     framesCpy.forEach(frame => {
-      frame.deleteTextPlacement(textIdToDelete);
+      frame.deleteText(textIdToDelete);
     });
 
     setFrames(framesCpy);
@@ -111,10 +124,10 @@ export default function EditorPageSidebar() {
       <br />
       <TextInputForm onSubmit={evt => {
         evt.preventDefault();
-        addTextToFrame(textRef.current.value);
+        addTextToFrames(textRef.current.value);
       }}>
         <input type="text" ref={textRef} />
-        <AddTextBtn onClick={() => addTextToFrame(textRef.current.value)}>Add</AddTextBtn>
+        <AddTextBtn onClick={() => addTextToFrames(textRef.current.value)}>Add</AddTextBtn>
       </TextInputForm>
       <br />
       <br />

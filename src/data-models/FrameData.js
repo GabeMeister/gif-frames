@@ -30,17 +30,30 @@ class FrameData {
     return !!this.getTextPlacement(textId);
   }
 
-  deleteTextPlacement(textId) {
+  deleteText(textId) {
     this.textLayerData.deleteTextPlacement(textId);
   }
 
   // Get the list of all texts, optionally exclude specified texts by id
   getTextList() {
-    return this.textLayerData.textPlacements;
+    return this.textLayerData.getTextPlacements();
   }
 
+  getVisibleTextList() {
+    return this.textLayerData.getVisibleTextPlacements();
+  }
+
+  // Same as getTextList() but optionally exclude some text ids
   getTextListWithout(excludedTextIds) {
-    return this.textLayerData.getTextListWithout(excludedTextIds);
+    return this.textLayerData.getTextPlacementsWithout(excludedTextIds);
+  }
+
+  getVisibleTextListWithout(excludedTextIds) {
+    return this.textLayerData.getVisibleTextPlacementsWithout(excludedTextIds);
+  }
+
+  setTextPlacementVisibility(textId, isVisible) {
+    return this.getTextPlacement(textId).isVisible = isVisible;
   }
 }
 

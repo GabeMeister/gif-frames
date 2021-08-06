@@ -4,11 +4,12 @@ import TextManager from "./TextManager";
 // things that are associated with the placement of the text on the canvas,
 // rather than the text itself.
 class TextPlacement {
-  constructor(id, x, y) {
+  constructor(id, x, y, isVisible = false) {
     // The textId must refer to an id that exists in the global texts array
     this.textId = id;
     this.x = x;
     this.y = y;
+    this.isVisible = isVisible;
   }
 
   getWidth(ctx) {

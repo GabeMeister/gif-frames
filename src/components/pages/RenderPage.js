@@ -28,7 +28,7 @@ export default function RenderPage() {
   const renderGif = useCallback(() => {
     var gif = new window.GIF({
       workers: 10,
-      quality: 100
+      quality: 1
     });
 
     let renderTasks = [];
@@ -54,11 +54,7 @@ export default function RenderPage() {
             drawTextOnCanvas(ctx, textData, fontSize);
           });
 
-          gif.addFrame(currentFrame, {
-            delay: delay
-          });
-
-          resolve();
+          resolve(currentFrame);
         }
       });
 
@@ -70,7 +66,13 @@ export default function RenderPage() {
       setBlobUrl(URL.createObjectURL(blob));
     });
 
-    Promise.all(renderTasks).then(() => {
+    Promise.all(renderTasks).then(allCanvases => {
+      allCanvases.forEach(c => {
+        gif.addFrame(c, {
+          delay: delay
+        });
+      });
+      
       gif.render();
     });
   }, [delay, fontSize, frames]);
@@ -89,7 +91,7 @@ export default function RenderPage() {
     setLoading(true);
     renderGif();
   }, [delay, renderGif]);
-  
+
   return (
     <StyledRenderPageDiv>
       <RenderPageSidebar />

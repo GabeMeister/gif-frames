@@ -20,8 +20,9 @@ import BackgroundTextLayer from "../BackgroundTextLayer";
 import Controls from "../Controls";
 import PositionBuffer from "../../data-models/PositionBuffer";
 import { renderText } from "../lib/frames";
-// import useInterval from "../lib/useInterval";
 import useCountdownTimer from "../lib/useCountdownTimer";
+import ProgressBar from "../ProgressBar";
+import { getPercent } from "../lib/math";
 
 const StyledEditorPageDiv = styled.div`
   width: 1024px;
@@ -35,6 +36,11 @@ function useQuery() {
 }
 
 export default function EditorPage() {
+  
+  /*
+   * INITIALIZATION
+   */
+
   const [frames, setFrames] = useRecoilState(framesState);
   const [frameIdx, setFrameIdx] = useRecoilState(frameIndexState);
   const setFrameSize = useSetRecoilState(frameSizeState);
@@ -46,6 +52,10 @@ export default function EditorPage() {
   // Retrieve the gifUrl query param
   let query = useQuery();
   const gifUrl = query.get('gifUrl');
+
+  /*
+   * HELPER FUNCTIONS
+   */
 
   function onNextFrame() {
     if(frameIdx < frames.length - 1) {
@@ -97,10 +107,10 @@ export default function EditorPage() {
 
   function getBackgroundText() {
     if(selectedTextId) {
-      return frames[frameIdx]?.getTextListWithout([selectedTextId]);
+      return frames[frameIdx]?.getVisibleTextListWithout([selectedTextId]);
     }
     else {
-      return frames[frameIdx]?.getTextList();
+      return frames[frameIdx]?.getVisibleTextList();
     }
   }
 
@@ -130,10 +140,20 @@ export default function EditorPage() {
     }
   }
 
+  /*
+   * HOOKS
+   */
+
   const initialize = useCallback(() => {
     // If we don't have a gif url don't do anything, we're about to redirect
     // back to the home page anyway
     if (!gifUrl) {
+      return;
+    }
+
+    // If we're coming BACK to the editor page from another page, don't bother
+    // re-initializing
+    if(frames.length) {
       return;
     }
 
@@ -155,11 +175,11 @@ export default function EditorPage() {
         width: extractedFrames[0].imageLayerData.width
       });
     });
-  }, [gifUrl, setFrames, setFrameIdx, setFrameSize]);
+  }, [gifUrl, setFrames, setFrameIdx, setFrameSize, frames.length]);
 
   useEffect(() => {
     initialize();
-  }, [gifUrl, setFrames, setFrameIdx, setFrameSize, initialize]);
+  }, [gifUrl, initialize]);
 
   const { 
     restart,
@@ -190,7 +210,7 @@ export default function EditorPage() {
         {frames.length !== 0 ? (
           <>
             <EditorPageSidebar textLayerData={frames[frameIdx].textLayerData} />
-            <div>
+            <div style={{ height: `${frames[frameIdx].textLayerData.height + 30}px` }}>
               <ImageLayer
                 imageLayerData={frames[frameIdx].imageLayerData}
               />
@@ -206,6 +226,7 @@ export default function EditorPage() {
                 />
               )}
             </div>
+            <ProgressBar percent={getPercent(frameIdx, frames.length - 1)} />
             <Controls>
               <div>
                 <h1>{frameIdx + 1} / {frames.length}</h1>
@@ -226,7 +247,9 @@ export default function EditorPage() {
             </Controls>
           </>
         ) : (
-          <h1>Loading...</h1>
+          <>
+            <h1>Loading...</h1>
+          </>
         )}
       </StyledEditorPageDiv>
     </Hotkeys>
