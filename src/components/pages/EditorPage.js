@@ -1,5 +1,4 @@
 import React, { useEffect, useCallback, useState } from "react";
-import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import cloneDeep from "lodash.clonedeep";
 import { useRecoilState, useSetRecoilState } from "recoil";
@@ -23,6 +22,7 @@ import { renderText } from "../lib/frames";
 import useCountdownTimer from "../lib/useCountdownTimer";
 import ProgressBar from "../ProgressBar";
 import { getPercent } from "../lib/math";
+import useQueryParam from "../lib/useQueryParam";
 
 const StyledEditorPageDiv = styled.div`
   width: 1024px;
@@ -30,10 +30,6 @@ const StyledEditorPageDiv = styled.div`
   margin: auto;
   height: 100vh;
 `;
-
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
 export default function EditorPage() {
   
@@ -50,8 +46,7 @@ export default function EditorPage() {
   const backgroundTextList = getBackgroundText();
 
   // Retrieve the gifUrl query param
-  let query = useQuery();
-  const gifUrl = query.get('gifUrl');
+  const gifUrl = useQueryParam('gifUrl');
 
   if(!gifUrl) {
     document.location.href = '/';
@@ -290,7 +285,7 @@ export default function EditorPage() {
               <Button color="BurlyWood" onClick={goToBeginning}>Go to First Frame</Button>
               <br />
               <br />
-              <Button color="lightgreen"><Link to="/render">Finish</Link></Button>
+              <Button color="lightgreen"><Link to={`/render?gifUrl=${gifUrl}`}>Finish</Link></Button>
               <br />
               <br />
               {isAutoplaying && (

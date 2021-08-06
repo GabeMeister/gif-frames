@@ -7,12 +7,16 @@ import StyledSidebarDiv from './styled-components/StyledSidebarDiv';
 import delayState from './state/atoms/delayState';
 import ConfirmLink from './ConfirmLink';
 import Link from './Link';
+import useQueryParam from './lib/useQueryParam';
 
 const MAX_DELAY = 200;
 
 // A sidebar that holds all the different texts of the current frame
 export default function RenderPageSidebar() {
   const setDelay = useSetRecoilState(delayState);
+
+  // Retrieve the gifUrl query param
+  const gifUrl = useQueryParam('gifUrl');
 
   function onGifSpeedChange(delay) {
     // Because a larger delay means the gif will be slower, we have to reverse
@@ -26,7 +30,7 @@ export default function RenderPageSidebar() {
       <ConfirmLink to='/' text={'← Create new gif'} />
       <br />
       <br />
-      <Link to='/editor' text={'← Back to Editing'} />
+      <Link to={`/editor?gifUrl=${gifUrl}`} text={'← Back to Editing'} />
       <br />
       <br />
       <br />
