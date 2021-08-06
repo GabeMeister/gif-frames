@@ -53,6 +53,10 @@ export default function EditorPage() {
   let query = useQuery();
   const gifUrl = query.get('gifUrl');
 
+  if(!gifUrl) {
+    document.location.href = '/';
+  }
+
   /*
    * HELPER FUNCTIONS
    */
@@ -60,46 +64,80 @@ export default function EditorPage() {
   function onNextFrame() {
     if(frameIdx < frames.length - 1) {
       // Have to "render" the text onto the current frame
-      let newFrames = renderText(frames, frameIdx, selectedTextId, PositionBuffer.x, PositionBuffer.y);
+      let framesCpy = renderText(frames, frameIdx, selectedTextId, PositionBuffer.x, PositionBuffer.y);
 
       // Then copy that text onto the next frame
-      newFrames = copyFrameToNext(newFrames);
+      framesCpy = copyFrameToNext(framesCpy);
 
       // Save the new frames data
-      setFrames(newFrames);
+      setFrames(framesCpy);
 
       // Then obviously move to the next frame
       setFrameIdx(frameIdx + 1);
     }
   }
 
+  function onPreviousFrame() {
+    if(frameIdx > 0) {
+      // Have to "render" the text onto the current frame
+      let framesCpy = renderText(frames, frameIdx, selectedTextId, PositionBuffer.x, PositionBuffer.y);
+
+      // Then copy that text onto the previous frame
+      framesCpy = copyFrameToPrevious(framesCpy);
+
+      // Save the new frames data
+      setFrames(framesCpy);
+
+      // Then obviously move to the previous frame
+      setFrameIdx(frameIdx - 1);
+    }
+  }
+
   function goToBeginning() {
     // Have to "render" the text onto the current frame
-    let newFrames = renderText(frames);
+    let framesCpy = renderText(frames);
 
     // Save the new frames data
-    setFrames(newFrames);
+    setFrames(framesCpy);
     setFrameIdx(0);
     setSelectedTextId(null);
   }
 
+  function goToEnd() {
+    // Have to "render" the text onto the current frame
+    let framesCpy = renderText(frames);
+
+    // Save the new frames data
+    setFrames(framesCpy);
+    setFrameIdx(frames.length - 1);
+    setSelectedTextId(null);
+  }
+
   function copyFrameToNext(currentFrames) {
+    return copyFrameToIndex(currentFrames, frameIdx + 1);
+  }
+
+  function copyFrameToPrevious(currentFrames) {
+    return copyFrameToIndex(currentFrames, frameIdx - 1)
+  }
+
+  function copyFrameToIndex(currentFrames, destinationIndex) {
     if(!selectedTextId) {
       // Don't worry about doing anything if we don't have any text to work with
       return currentFrames;
     }
 
     let framesCpy = cloneDeep(currentFrames);
-    let nextFrame = framesCpy[frameIdx + 1];
+    let destinationFrame = framesCpy[destinationIndex];
 
-    if(!nextFrame.hasTextPlacement(selectedTextId)){
+    if(!destinationFrame.hasTextPlacement(selectedTextId)){
       // We have to create a new text object in the new frame because it doesn't exist yet
-      nextFrame.addTextPlacement(selectedTextId);
+      destinationFrame.addTextPlacement(selectedTextId);
     }
     else {
       // Update the text position in the next frame
-      nextFrame.getTextPlacement(selectedTextId).x = PositionBuffer.x;
-      nextFrame.getTextPlacement(selectedTextId).y = PositionBuffer.y;
+      destinationFrame.getTextPlacement(selectedTextId).x = PositionBuffer.x;
+      destinationFrame.getTextPlacement(selectedTextId).y = PositionBuffer.y;
     }
 
     return framesCpy;
@@ -132,7 +170,16 @@ export default function EditorPage() {
         }
         break;
       case 'left':
+        onPreviousFrame();
+        break;
+      case 'right':
+        onNextFrame();
+        break;
+      case 'shift+left':
         goToBeginning();
+        break;
+      case 'shift+right':
+        goToEnd();
         break;
       default:
         // Do nothing
@@ -203,7 +250,7 @@ export default function EditorPage() {
   
   return (
     <Hotkeys
-      keyName="enter,space,left"
+      keyName="enter,space,left,right,shift+left,shift+right"
       onKeyDown={handleKeydown}
     >
       <StyledEditorPageDiv>
@@ -226,6 +273,11 @@ export default function EditorPage() {
                 />
               )}
             </div>
+            <Button onClick={() => goToBeginning()}>{'<<'}</Button>{' '}
+            <Button onClick={() => onPreviousFrame()}>{'<'}</Button>{' '}
+            <Button onClick={() => onNextFrame()}>{'>'}</Button>{' '}
+            <Button onClick={() => goToEnd()}>{'>>'}</Button>
+            <br />
             <ProgressBar percent={getPercent(frameIdx, frames.length - 1)} />
             <Controls>
               <div>
