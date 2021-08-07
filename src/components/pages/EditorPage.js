@@ -152,6 +152,8 @@ export default function EditorPage() {
     
     switch(keyName) {
       case 'enter':
+      case 'right':
+      case 's':
         onNextFrame();
         break;
       case 'space':
@@ -166,9 +168,6 @@ export default function EditorPage() {
         break;
       case 'left':
         onPreviousFrame();
-        break;
-      case 'right':
-        onNextFrame();
         break;
       case 'shift+left':
         goToBeginning();
@@ -245,7 +244,7 @@ export default function EditorPage() {
   
   return (
     <Hotkeys
-      keyName="enter,space,left,right,shift+left,shift+right"
+      keyName="enter,s,space,left,right,shift+left,shift+right"
       onKeyDown={handleKeydown}
     >
       <StyledEditorPageDiv>
@@ -279,13 +278,7 @@ export default function EditorPage() {
                 <h1>{frameIdx + 1} / {frames.length}</h1>
               </div>
               <br />
-              <Button color="orange" onClick={onNextFrame}>Next Frame</Button>
-              <br />
-              <br />
-              <Button color="BurlyWood" onClick={goToBeginning}>Go to First Frame</Button>
-              <br />
-              <br />
-              <Button color="lightgreen"><Link to={`/render?gifUrl=${gifUrl}`}>Finish</Link></Button>
+              <Button color="lightgreen"><Link to={`/render?gifUrl=${gifUrl}`}>Preview & Finish</Link></Button>
               <br />
               <br />
               {isAutoplaying && (

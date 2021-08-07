@@ -50,7 +50,7 @@ export default function RenderPage() {
           ctx.drawImage(img, 0, 0);
 
           // Add text to the canvas
-          frames[i].getTextList().forEach(textData => {
+          frames[i].getVisibleTextList().forEach(textData => {
             drawTextOnCanvas(ctx, textData, fontSize);
           });
 

@@ -13,6 +13,10 @@ import selectedTextIdState from "./state/atoms/selectedTextIdState";
 import isTextSelectedState from "./state/atoms/isTextSelectedState";
 import { drawTextOnCanvas } from "./lib/fonts";
 import { getMousePos, isCursorPositionOverText } from "./lib/mouseEvents";
+import useContextMenu from "./lib/useContextMenu";
+import RightClickMenu from "./RightClickMenu";
+import TextContextMenuOptions from "./TextContextMenuOptions";
+import TextManager from '../data-models/TextManager';
 
 const StyledDraggableTextLayerWrapperDiv = styled.div`
   position: absolute;
@@ -25,10 +29,15 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
   const fontSize = useRecoilValue(fontSizeState);
   const frameIdx = useRecoilValue(frameIndexState);
   const [selectedTextId, setSelectedTextId] = useRecoilState(selectedTextIdState);
+  // Think of isTextSelected as "is the user currently mouse down on any text?"
   const [isTextSelected, setIsTextSelected] = useRecoilState(isTextSelectedState);
   const [textPlacement, setTextPlacement] = useState(initialTextPlacement);
   const [frames, setFrames] = useRecoilState(framesState);
   const [cursorPos, setCursorPos] = useState({ x: -1, y: -1 });
+  const { show, coord, onContextMenu } = useContextMenu({ onMenuClose: () => {
+    setIsTextSelected(false);
+    setSelectedTextId(null);
+  }});
 
   function onMouseDown(e) {
     const pos = getMousePos(canvasRef.current, e);
@@ -47,10 +56,21 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
   function onMouseUp(e) {
     setIsTextSelected(false);
     let newFrames = renderText(frames, frameIdx, selectedTextId, PositionBuffer.x, PositionBuffer.y);
+
+    // TODO: set frames on all upcoming frames as well IF it makes sense to
+    // (e.g. the user isn't just tweaking one of the text positions in the
+    // middle)
+
+
     setFrames(newFrames);
   }
 
   function onMouseMove(e) {
+    if(show) {
+      // Don't do anything when the right click context menu is open
+      return;
+    }
+    
     const pos = getMousePos(canvasRef.current, e);
     const ctx = canvasRef.current.getContext('2d');
 
@@ -75,6 +95,45 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
       // The user hovered away from the text
       setSelectedTextId(null);
     }
+  }
+
+  function deleteText(textIdToDelete) {
+    // Delete the text itself
+    TextManager.deleteTextById(textIdToDelete);
+    
+    // Delete the associated text placements from all the frames
+    let framesCpy = cloneDeep(frames);
+
+    framesCpy.forEach(frame => {
+      frame.deleteText(textIdToDelete);
+    });
+
+    setFrames(framesCpy);
+
+    // The current selected text might be the one that we just deleted, so clear that out as well
+    if(selectedTextId === textIdToDelete) {
+      setSelectedTextId(null);
+    }
+  }
+
+  function hideTextBefore() {
+    let framesCpy = cloneDeep(frames);
+
+    for(let i = frameIdx - 1; i >= 0; i--) {
+      framesCpy[i].setTextPlacementVisibility(selectedTextId, false);
+    }
+
+    setFrames(framesCpy);
+  }
+
+  function hideTextAfter() {
+    let framesCpy = cloneDeep(frames);
+
+    for(let i = frameIdx + 1; i < framesCpy.length; i++) {
+      framesCpy[i].setTextPlacementVisibility(selectedTextId, false);
+    }
+
+    setFrames(framesCpy);
   }
 
   useEffect(() => {
@@ -109,7 +168,7 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
       canvasRef.current.style.cursor = 'grab';
     }
   }, [isTextSelected, canvasRef]);
-  
+
   return (
     <StyledDraggableTextLayerWrapperDiv>
       <canvas
@@ -120,7 +179,15 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseMove={onMouseMove}
+        onContextMenu={onContextMenu}
       />
+      <RightClickMenu show={show} coord={coord} content={(
+        <TextContextMenuOptions
+          onDeleteAllClick={() => deleteText(selectedTextId)}
+          onHideBeforeClick={() => hideTextBefore()}
+          onHideAfterClick={() => hideTextAfter()}
+        />
+      )} />
     </StyledDraggableTextLayerWrapperDiv>
   );
 }

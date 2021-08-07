@@ -65,15 +65,16 @@ export default function EditorPageSidebar() {
 
     let framesCpy = cloneDeep(frames);
     
-    // Create the new text "placement" for this frame in particular (the thing
-    // that keeps track of where a particular piece of text is in the frame)
-    framesCpy[frameIdx].addTextPlacement(newText.id);
-    framesCpy[frameIdx].setTextPlacementVisibility(newText.id, true);
+    // Create the new text "placement" for all frames
+    // framesCpy[frameIdx].addTextPlacement(newText.id);
     
-    // // Create the new text "placement" for all frames
-    // framesCpy.forEach(frame => {
-    //   frame.addTextPlacement(newText.id);
-    // });
+    // Create the new text "placement" for all frames
+    framesCpy.forEach(frame => {
+      frame.addTextPlacement(newText.id);
+    });
+
+    // But only make it visible on the current frame
+    framesCpy[frameIdx].setTextPlacementVisibility(newText.id, true);
 
     // // Make it visible from current frame onwards
     // for(let i = frameIdx; i < framesCpy.length; i++) {
