@@ -17,6 +17,7 @@ import useContextMenu from "./lib/useContextMenu";
 import RightClickMenu from "./RightClickMenu";
 import TextContextMenuOptions from "./TextContextMenuOptions";
 import TextManager from '../data-models/TextManager';
+import useAutoPositionedTextIndices from "./lib/useAutoPositionedTextIndices";
 
 const StyledDraggableTextLayerWrapperDiv = styled.div`
   position: absolute;
@@ -38,6 +39,11 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
     setIsTextSelected(false);
     setSelectedTextId(null);
   }});
+  const {
+    updateAutoPosition,
+    deleteAutoPosition,
+    autoPositionedTextIndices
+  } = useAutoPositionedTextIndices();
 
   function onMouseDown(e) {
     const pos = getMousePos(canvasRef.current, e);
@@ -55,14 +61,21 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
 
   function onMouseUp(e) {
     setIsTextSelected(false);
-    let newFrames = renderText(frames, frameIdx, selectedTextId, PositionBuffer.x, PositionBuffer.y);
+    
+    let framesCpy = cloneDeep(frames);
+    framesCpy = renderText(frames, frameIdx, selectedTextId, PositionBuffer.x, PositionBuffer.y);
 
-    // TODO: set frames on all upcoming frames as well IF it makes sense to
-    // (e.g. the user isn't just tweaking one of the text positions in the
-    // middle)
+    // If the current frameIdx is beyond the recorded auto positioned text
+    // index, then update the rest of them
+    if(frameIdx >= autoPositionedTextIndices[selectedTextId] - 1) {
+      // Set all the remaining frames to where the user just placed the text
+      for(let i = frameIdx + 1; i < framesCpy.length; i++) {
+        framesCpy = renderText(framesCpy, i, selectedTextId, PositionBuffer.x, PositionBuffer.y);
+      }
+    }
 
-
-    setFrames(newFrames);
+    updateAutoPosition();
+    setFrames(framesCpy);
   }
 
   function onMouseMove(e) {
@@ -114,6 +127,8 @@ export default function DraggableTextLayer({ initialTextPlacement }) {
     if(selectedTextId === textIdToDelete) {
       setSelectedTextId(null);
     }
+
+    deleteAutoPosition(selectedTextId);
   }
 
   function hideTextBefore() {

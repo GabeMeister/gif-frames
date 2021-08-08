@@ -7,6 +7,7 @@ const StyledTextContextMenuOptions = styled.div`
   font-size: 24px;
   line-height: 36px;
   cursor: pointer;
+  border-radius: 5px;
 `;
 
 const MenuItem = styled.div`

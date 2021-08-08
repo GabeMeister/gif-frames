@@ -13,6 +13,7 @@ import Button from "./Button";
 import StyledSidebarDiv from './styled-components/StyledSidebarDiv';
 import ConfirmLink from './ConfirmLink';
 import TextManager from '../data-models/TextManager';
+import useAutoPositionedTextIndices from './lib/useAutoPositionedTextIndices';
 
 const AddTextBtn = styled(Button)`
   margin-left: 5px;
@@ -51,6 +52,7 @@ export default function EditorPageSidebar() {
   const [selectedTextId, setSelectedTextId] = useRecoilState(selectedTextIdState);
   const setFontSize = useSetRecoilState(fontSizeState);
   const frameIdx = useRecoilValue(frameIndexState);
+  const { initAutoPosition, deleteAutoPosition } = useAutoPositionedTextIndices();
 
   function addTextToFrames(text) {
     if(text === '') {
@@ -65,21 +67,18 @@ export default function EditorPageSidebar() {
 
     let framesCpy = cloneDeep(frames);
     
-    // Create the new text "placement" for all frames
-    // framesCpy[frameIdx].addTextPlacement(newText.id);
-    
-    // Create the new text "placement" for all frames
+    // Create the new text "placement" for all frames, but initially create them
+    // hidden
     framesCpy.forEach(frame => {
       frame.addTextPlacement(newText.id);
     });
 
-    // But only make it visible on the current frame
-    framesCpy[frameIdx].setTextPlacementVisibility(newText.id, true);
-
-    // // Make it visible from current frame onwards
-    // for(let i = frameIdx; i < framesCpy.length; i++) {
-    //   framesCpy[i].setTextPlacementVisibility(newText.id, true);
-    // }
+    // Make it visible from current frame onwards
+    for(let i = frameIdx; i < framesCpy.length; i++) {
+      framesCpy[i].setTextPlacementVisibility(newText.id, true);
+    }
+    
+    initAutoPosition(newText.id, frameIdx + 1);
     
     setFrames(framesCpy);
   }
@@ -105,6 +104,8 @@ export default function EditorPageSidebar() {
     if(selectedTextId === textIdToDelete) {
       setSelectedTextId(null);
     }
+
+    deleteAutoPosition(textIdToDelete);
   }
   
   return (
