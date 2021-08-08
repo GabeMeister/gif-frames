@@ -11,7 +11,7 @@ export default function GifSearcher({ onGifSelected }) {
 
   return (
     <div>
-      <div className="">
+      <div>
         <input
           ref={searchWordRef}
           type="text"

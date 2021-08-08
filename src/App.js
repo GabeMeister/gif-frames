@@ -17,7 +17,7 @@ window.$ = $;
 
 function App() {
   return (
-    <div className="h-screen">
+    <div>
       <Router>
         <div>
           <Switch>

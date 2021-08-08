@@ -11,7 +11,7 @@ export default function ImageLayer({ imageLayerData }) {
     <StyledImageLayerImg
       src={imageLayerData.dataUrl}
       alt={`frame-thumbnail`}
-      className="js-frame-img select-none m-auto"
+      className="select-none m-auto"
     />
   );
 };

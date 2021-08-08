@@ -16,7 +16,7 @@ import selectedTextIdState from "../state/atoms/selectedTextIdState";
 import ImageLayer from "../ImageLayer";
 import DraggableTextLayer from "../DraggableTextLayer";
 import BackgroundTextLayer from "../BackgroundTextLayer";
-import Controls from "../Controls";
+import StyledControlsDiv from "../styled-components/StyledControlsDiv";
 import PositionBuffer from "../../data-models/PositionBuffer";
 import { renderText } from "../lib/frames";
 import useCountdownTimer from "../lib/useCountdownTimer";
@@ -273,7 +273,7 @@ export default function EditorPage() {
             <Button onClick={() => goToEnd()}>{'>>'}</Button>
             <br />
             <ProgressBar percent={getPercent(frameIdx, frames.length - 1)} />
-            <Controls>
+            <StyledControlsDiv>
               <div>
                 <h1>{frameIdx + 1} / {frames.length}</h1>
               </div>
@@ -284,7 +284,7 @@ export default function EditorPage() {
               {isAutoplaying && (
                 <h1>Autoplay Timer: {number}</h1>
               )}
-            </Controls>
+            </StyledControlsDiv>
           </>
         ) : (
           <>

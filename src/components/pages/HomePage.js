@@ -66,30 +66,6 @@ export default function HomePage() {
                   <GifSearcher onGifSelected={url => onSearchComplete(url)} />
                 )
               },
-              // {
-              //   name: 'url',
-              //   displayName: 'Url',
-              //   content: (
-              //     <>
-              //       <input
-              //         ref={gifUrlRef}
-              //         type="text"
-              //         value={gifUrl}
-              //         onChange={() => setGifUrl(gifUrlRef.current.value)}
-              //         className="pb-2 border-b-2 outline-none focus:border-blue-300 mx-auto w-1/3"
-              //       />{' '}
-              //       <button
-              //         onClick={onUrlEntered}
-              //         className={`${fetchLoading ? 'disabled:opacity-50 bg-gray-300' : 'bg-blue-300'} ml-3 p-2.5 rounded`}
-              //       >
-              //         {fetchLoading
-              //           ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
-              //           : <span>Go</span>
-              //         }
-              //       </button>
-              //     </>
-              //   )
-              // },
               {
                 name: 'file',
                 displayName: 'Upload',
