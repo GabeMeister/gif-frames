@@ -4,7 +4,6 @@ import useInterval from "../lib/useInterval";
 
 const StyledTestPageDiv = styled.div`
   width: 1024px;
-  background-color: lightgray;
   margin: auto;
   height: 100vh;
   box-sizing: border-box;

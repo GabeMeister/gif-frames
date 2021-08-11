@@ -11,11 +11,14 @@ import { drawTextOnCanvas } from "../lib/fonts";
 
 const StyledRenderPageDiv = styled.div`
   width: 1024px;
-  background-color: lightgray;
   margin: auto;
   height: 100vh;
   box-sizing: border-box;
   padding: 10px;
+`;
+
+const StyledPreviewImg = styled.img`
+  border-radius: 3px;
 `;
 
 export default function RenderPage() {
@@ -101,7 +104,7 @@ export default function RenderPage() {
         </>
       ) : (
         <>
-          <img src={blobUrl} alt="preview-gif" />
+          <StyledPreviewImg src={blobUrl} alt="preview-gif" />
           <br />
           <Button onClick={() => downloadGif(blobUrl)}>Download</Button>
         </>

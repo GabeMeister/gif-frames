@@ -26,7 +26,6 @@ import useQueryParam from "../lib/useQueryParam";
 
 const StyledEditorPageDiv = styled.div`
   width: 1024px;
-  background-color: lightgray;
   margin: auto;
   height: 100vh;
 `;
