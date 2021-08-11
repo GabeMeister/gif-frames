@@ -278,7 +278,7 @@ export default function EditorPage() {
                 <h1>{frameIdx + 1} / {frames.length}</h1>
               </div>
               <br />
-              <Link component={Button} to={`/render?gifUrl=${gifUrl}`}>Preview & Finish</Link>
+              <Link className="link-btn" to={`/render?gifUrl=${gifUrl}`}>Preview & Finish</Link>
               <br />
               <br />
               {isAutoplaying && (

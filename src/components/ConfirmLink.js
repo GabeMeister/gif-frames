@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import StyledLink from './styled-components/StyledLink';
 
 // Simple link tag that confirms with the user before navigating
 export default function ConfirmLink({
@@ -16,6 +15,6 @@ export default function ConfirmLink({
   }
   
   return (
-    <Link to={to} onClick={onLinkClick} component={StyledLink}>{text}</Link>
+    <Link className="link" to={to} onClick={onLinkClick}>{text}</Link>
   )
 }

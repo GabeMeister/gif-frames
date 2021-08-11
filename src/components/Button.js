@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
-const btn = styled.button`
+const Button = styled.button`
   background-color: #19b888;
   color: white;
-  border-radius: 5px;
+  border-radius: 3px;
   box-shadow: 0px;
   padding: 6px 14px;
   cursor: pointer;
@@ -14,9 +14,6 @@ const btn = styled.button`
   &:focus {
     background-color: #17a67b;
   }
-  &:active {
-    
-  }
 `;
 
-export default btn;
+export default Button;
