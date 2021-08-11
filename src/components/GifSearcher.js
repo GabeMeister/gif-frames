@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import Button from './Button';
+import StyledTextInput from './styled-components/StyledTextInput';
 
 import { useGifSearch } from './lib/hooks';
 
@@ -10,22 +11,6 @@ const StyledGifSearcher = styled.div`
 const StyledSearchWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
-`;
-
-const StyledSearchInput = styled.input`
-  margin-right: 5px;
-  flex-grow: 1;
-  line-height: 36px;
-  outline: none;
-  border-radius: 3px;
-  border: 1px solid #c4c4c4;
-  padding-left: 10px;
-  color: #454545;
-  font-size: 16px;
-
-  &:focus {
-    border: 1px solid #4778ff;
-  }
 `;
 
 const StyledNextButton = styled(Button)`
@@ -80,7 +65,7 @@ export default function GifSearcher({ onGifSelected }) {
   return (
     <StyledGifSearcher className="__StyledGifSearcher">
       <StyledSearchWrapper className="__StyledSearchWrapper">
-        <StyledSearchInput
+        <StyledTextInput
           className="__StyledSearchInput"
           ref={searchWordRef}
           type="text"

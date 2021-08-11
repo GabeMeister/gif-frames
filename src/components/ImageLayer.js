@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const StyledImageLayerImg = styled.img`
   position: absolute;
-  select: none;
+  user-select: none;
 `;
 
 export default function ImageLayer({ imageLayerData }) {
@@ -11,7 +11,6 @@ export default function ImageLayer({ imageLayerData }) {
     <StyledImageLayerImg
       src={imageLayerData.dataUrl}
       alt={`frame-thumbnail`}
-      className="select-none m-auto"
     />
   );
 };

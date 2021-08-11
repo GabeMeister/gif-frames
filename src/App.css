@@ -7,6 +7,6 @@
   font-family: 'AgentOrange';
 }
 
-body {
+body, button, input {
   font-family: 'Lato', sans-serif;
 }

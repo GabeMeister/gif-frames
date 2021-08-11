@@ -14,6 +14,7 @@ import StyledSidebarDiv from './styled-components/StyledSidebarDiv';
 import ConfirmLink from './ConfirmLink';
 import TextManager from '../data-models/TextManager';
 import useAutoPositionedTextIndices from './lib/useAutoPositionedTextIndices';
+import StyledTextInput from './styled-components/StyledTextInput';
 
 const AddTextBtn = styled(Button)`
   margin-left: 5px;
@@ -124,15 +125,6 @@ export default function EditorPageSidebar() {
         onChange={onFontSizeChange}
       />
       <br />
-      <TextInputForm onSubmit={evt => {
-        evt.preventDefault();
-        addTextToFrames(textRef.current.value);
-      }}>
-        <input type="text" ref={textRef} />
-        <AddTextBtn onClick={() => addTextToFrames(textRef.current.value)}>Add</AddTextBtn>
-      </TextInputForm>
-      <br />
-      <br />
       <ul>
         {!TextManager.empty() && TextManager.getAll().map(text => (
           <TextOptions key={text.id}>
@@ -163,6 +155,16 @@ export default function EditorPageSidebar() {
           </TextOptions>
         ))}
       </ul>
+      <br />
+      <TextInputForm onSubmit={evt => {
+        evt.preventDefault();
+        addTextToFrames(textRef.current.value);
+      }}>
+        <StyledTextInput type="text" ref={textRef} />
+        <AddTextBtn onClick={() => addTextToFrames(textRef.current.value)}>Add</AddTextBtn>
+      </TextInputForm>
+      <br />
+      <br />
     </StyledSidebarDiv>
   );
 }
