@@ -6,6 +6,6 @@ export default function Link({
   text
 }) {
   return (
-    <ReactRouterLink to={to}>{text}</ReactRouterLink>
+    <ReactRouterLink className="link" to={to}>{text}</ReactRouterLink>
   )
 }

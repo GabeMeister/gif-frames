@@ -15,6 +15,6 @@ export default function ConfirmLink({
   }
   
   return (
-    <Link to={to} onClick={onLinkClick}>{text}</Link>
+    <Link className="link" to={to} onClick={onLinkClick}>{text}</Link>
   )
 }

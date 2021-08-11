@@ -1,6 +1,59 @@
 import React, { useRef, useState } from 'react';
+import styled from 'styled-components';
+import Button from './Button';
+import StyledTextInput from './styled-components/StyledTextInput';
 
 import { useGifSearch } from './lib/hooks';
+
+const StyledGifSearcher = styled.div`
+`;
+
+const StyledSearchWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const StyledNextButton = styled(Button)`
+  display: ${props => props.show ? 'inline' : 'none'}
+`;
+
+const StyledLoadingText = styled.div`
+  text-align: center;
+  margin-top: 20px;
+`;
+
+const StyledGifViewer = styled.div`
+  width: 1600px;
+  margin: auto;
+  margin-top: 20px;
+  height: 650px;
+  overflow: scroll;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  // WEIRD HACK: put a child container in a parent div where the child container
+  // is wider than the parent
+  position: absolute;
+  left: 0;
+  right: 0;
+`;
+
+const StyledThumbnailWrapper = styled.div`
+  margin-right: 10px;
+  margin-top: 10px;
+  max-height: 200px;
+  width: 300px;
+  object-fit: contain;
+`;
+
+const StyledThumbnail = styled.img`
+  cursor: pointer;
+  max-width: 300px;
+  max-height: 200px;
+  border: ${props => props.selected ? '10px solid lightgreen' : 'none'};
+  box-sizing: border-box;
+`;
 
 export default function GifSearcher({ onGifSelected }) {
   const searchWordRef = useRef(null);
@@ -10,43 +63,52 @@ export default function GifSearcher({ onGifSelected }) {
   const [selectedGif, setSelectedGif] = useState(null);
 
   return (
-    <div>
-      <div className="">
-        <input
+    <StyledGifSearcher className="__StyledGifSearcher">
+      <StyledSearchWrapper className="__StyledSearchWrapper">
+        <StyledTextInput
+          className="__StyledSearchInput"
           ref={searchWordRef}
           type="text"
           value={searchWord}
           onChange={() => setSearchWord(searchWordRef.current.value)}
           placeholder="Search for a gif..."
-          className="mx-auto pb-2 border-b-2 outline-none focus:border-blue-300 w-1/2"
         />
-        <button className={`${selectedGif !== null ? '' : 'invisible'} ml-3 p-2 rounded bg-green-400`} onClick={() => onGifSelected(selectedGif.url)}>Next →</button>
-      </div>
+        <StyledNextButton
+          className="__StyledNextButton"
+          show={selectedGif !== null}
+          onClick={() => onGifSelected(selectedGif.url)}
+        >
+          Next →
+        </StyledNextButton>
+      </StyledSearchWrapper>
       {gifsLoading && (
-        <div className="text-center	mt-3">Loading...</div>
+        <StyledLoadingText className="__StyledLoadingText">Loading...</StyledLoadingText>
       )}
       {gifsError && (
         <div>Error occurred while loading gifs...</div>
       )}
       {!!gifs.length && (
-        <div className="mt-3 text-center p-3 overflow-scroll border-solid border rounded rounded-sm border-gray-300" style={{ height: '650px' }}>
+        <StyledGifViewer className="__StyledGifViewer">
           {
             gifs.map(gif => (
-              <img
-                key={gif.id}
-                alt="gif_thumbnail_preview"
-                src={(hoveredGifId === gif.id) || (selectedGif !== null && selectedGif.id === gif.id) ? gif.url : gif.thumbnail}
-                onMouseEnter={() => setHoveredGifId(gif.id)}
-                onMouseLeave={() => setHoveredGifId('')}
-                className={`m-3 w-48 inline-block cursor-pointer ${selectedGif !== null && gif.id === selectedGif.id ? 'border-green-400 border-solid border-8 rounded' : ''}`}
-                onClick={() => {
-                  setSelectedGif(gif);
-                }}
-              />
+              <StyledThumbnailWrapper>
+                <StyledThumbnail
+                  className="__StyledThumbnail"
+                  selected={selectedGif !== null && gif.id === selectedGif.id}
+                  key={gif.id}
+                  alt="gif_thumbnail_preview"
+                  src={(hoveredGifId === gif.id) || (selectedGif !== null && selectedGif.id === gif.id) ? gif.url : gif.thumbnail}
+                  onMouseEnter={() => setHoveredGifId(gif.id)}
+                  onMouseLeave={() => setHoveredGifId('')}
+                  onClick={() => {
+                    setSelectedGif(gif);
+                  }}
+                />
+              </StyledThumbnailWrapper>
             ))
           }
-        </div>
+        </StyledGifViewer>
       )}
-    </div >
+    </StyledGifSearcher>
   );
 };

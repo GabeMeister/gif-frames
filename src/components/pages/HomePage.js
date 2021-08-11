@@ -3,37 +3,33 @@ import {
   Redirect
 } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
+import styled from 'styled-components';
+
 import TextManager from '../../data-models/TextManager';
 import GifSearcher from '../GifSearcher';
 import GifUploader from '../GifUploader';
 import RadioTab from '../RadioTab';
-
 import framesState from '../state/atoms/framesState';
 import selectedTextIdState from '../state/atoms/selectedTextIdState';
+import Spacer from '../Spacer';
+
+const StyledHomePage = styled.div`
+  padding: 20px;
+  padding-top: 40px;
+  width: 1280px;
+  margin: auto;
+`;
+
+const StyledHeadline = styled.h1`
+  text-align: center;
+  font-size: 80px;
+`;
 
 export default function HomePage() {
   const [gifUrl, setGifUrl] = useState('');
   const [redirecting, setRedirecting] = useState(false);
   const setFrames = useSetRecoilState(framesState);
   const setSelectedTextId = useSetRecoilState(selectedTextIdState);
-  // const [fetchLoading, setFetchLoading] = useState(false);
-  // const gifUrlRef = useRef(null);
-
-  /*
-   * DEBUGGING PURPOSES
-   */
-  // http://localhost:3000/editor?gifUrl=https://media.giphy.com/media/3o7aD0ILhi08LGF1PG/giphy.gif
-
-  // function onUrlEntered() {
-  //   setFetchLoading(true);
-  //   setTimeout(() => {
-  //     if (gifUrl.endsWith('.gif')) {
-  //       setRedirecting(true);
-  //     }
-
-  //     setFetchLoading(false);
-  //   }, 300);
-  // }
 
   function onSearchComplete(url) {
     setGifUrl(url);
@@ -56,8 +52,9 @@ export default function HomePage() {
       {redirecting ? (
         <Redirect to={`/editor?gifUrl=${gifUrl}`} />
       ) : (
-          <div className="p-6 w-2/3 mr-auto ml-auto text-center">
-            <h1 className="text-8xl mt-3 mb-10 headline">Text Gif</h1>
+          <StyledHomePage>
+            <StyledHeadline className="AgentOrange">Text Gif</StyledHeadline>
+            <Spacer height="40px" />
             <RadioTab options={[
               {
                 name: 'search',
@@ -66,30 +63,6 @@ export default function HomePage() {
                   <GifSearcher onGifSelected={url => onSearchComplete(url)} />
                 )
               },
-              // {
-              //   name: 'url',
-              //   displayName: 'Url',
-              //   content: (
-              //     <>
-              //       <input
-              //         ref={gifUrlRef}
-              //         type="text"
-              //         value={gifUrl}
-              //         onChange={() => setGifUrl(gifUrlRef.current.value)}
-              //         className="pb-2 border-b-2 outline-none focus:border-blue-300 mx-auto w-1/3"
-              //       />{' '}
-              //       <button
-              //         onClick={onUrlEntered}
-              //         className={`${fetchLoading ? 'disabled:opacity-50 bg-gray-300' : 'bg-blue-300'} ml-3 p-2.5 rounded`}
-              //       >
-              //         {fetchLoading
-              //           ? <span>Loading <img alt="loading-spinner" className="inline h-3" src="spinner.gif" /></span>
-              //           : <span>Go</span>
-              //         }
-              //       </button>
-              //     </>
-              //   )
-              // },
               {
                 name: 'file',
                 displayName: 'Upload',
@@ -98,7 +71,7 @@ export default function HomePage() {
                 )
               }
             ]} />
-          </div>
+          </StyledHomePage>
         )}
     </>
   );

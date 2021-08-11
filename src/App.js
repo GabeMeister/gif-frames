@@ -12,12 +12,18 @@ import EditorPage from './components/pages/EditorPage';
 import RenderPage from './components/pages/RenderPage';
 import TestPage from './components/pages/TestPage';
 import HomePage from './components/pages/HomePage';
+import styled from 'styled-components';
+
+const StyledApp = styled.div`
+  height: 100vh;
+  width: 100%;
+`;
 
 window.$ = $;
 
 function App() {
   return (
-    <div className="h-screen">
+    <StyledApp>
       <Router>
         <div>
           <Switch>
@@ -36,7 +42,7 @@ function App() {
           </Switch>
         </div>
       </Router>
-    </div>
+    </StyledApp>
   )
 }
 

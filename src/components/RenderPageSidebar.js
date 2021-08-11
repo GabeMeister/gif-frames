@@ -41,6 +41,7 @@ export default function RenderPageSidebar() {
         step={1}
         defaultValue={MAX_DELAY / 2}
         onAfterChange={onGifSpeedChange}
+        railStyle={{ 'backgroundColor': '#b8b8b8' }}
       />
     </StyledSidebarDiv>
   );

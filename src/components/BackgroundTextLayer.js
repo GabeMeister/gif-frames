@@ -84,7 +84,6 @@ export default function BackgroundTextLayer({ textPlacements = [] }) {
         ref={canvasRef}
         height={frameSize.height}
         width={frameSize.width}
-        className="js-frame-canvas"
         onMouseMove={onMouseMove}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}

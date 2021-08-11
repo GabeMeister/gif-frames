@@ -1,30 +1,37 @@
-.arrow-left {
-  width: 0; 
-  height: 0; 
-  border-top: 20px solid transparent;
-  border-bottom: 20px solid transparent; 
-  border-right:20px solid black;
-  cursor: pointer;
-}
-
-.arrow-right {
-  width: 0; 
-  height: 0; 
-  border-top: 20px solid transparent;
-  border-bottom: 20px solid transparent;
-  border-left: 20px solid black;
-  cursor: pointer;
-}
-
 @font-face {
   font-family: 'AgentOrange';
   src: local('AgentOrange'), url('./AgentOrange.ttf') format('truetype');
 }
 
-.headline {
+.AgentOrange {
   font-family: 'AgentOrange';
 }
 
-body {
+body, button, input {
   font-family: 'Lato', sans-serif;
+}
+
+/* HACK: the component prop with React Router doesn't seem to navigate the same
+way as just using the direct link, so we are forced to style it via css instead
+of a normal styled component */
+.link {
+  text-decoration: none;
+  color: #0082C3;
+}
+
+.link-btn {
+  background-color: #19b888;
+  color: white;
+  border-radius: 3px;
+  box-shadow: 0px;
+  padding: 6px 14px;
+  cursor: pointer;
+  border-width: 0px;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.link-btn:hover,
+.link-btn:focus {
+  background-color: #17a67b;
 }

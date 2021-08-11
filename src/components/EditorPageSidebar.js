@@ -14,25 +14,28 @@ import StyledSidebarDiv from './styled-components/StyledSidebarDiv';
 import ConfirmLink from './ConfirmLink';
 import TextManager from '../data-models/TextManager';
 import useAutoPositionedTextIndices from './lib/useAutoPositionedTextIndices';
+import StyledTextInput from './styled-components/StyledTextInput';
 
-const AddTextBtn = styled(Button)`
+const StyledAddTextBtn = styled(Button)`
   margin-left: 5px;
 `;
 
-const TextOptions = styled.li`
+const StyledTextOptions = styled.li`
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
-const CheckboxAndLabelWrapper = styled.div`
+const StyledTextLabelWrapper = styled.div`
   display: flex;
   align-items: center;
 `;
 
-const TextLabel = styled.label`
-  font-size: 24px;
+const StyledTextLabel = styled.span`
   margin-left: 4px;
+  font: bold 28px sans-serif;
+  color: ${props => props.color};
+  text-shadow: 1px 1px 7px black;
 `;
 
 const DeleteBtn = styled.button`
@@ -122,47 +125,31 @@ export default function EditorPageSidebar() {
         step={1}
         defaultValue={32}
         onChange={onFontSizeChange}
+        railStyle={{ 'backgroundColor': '#b8b8b8' }}
       />
+      <br />
+      <ul>
+        {!TextManager.empty() && TextManager.getAll().map(text => (
+          <StyledTextOptions key={text.id}>
+            <StyledTextLabelWrapper>
+              <StyledTextLabel color={text.color}>{text.text}</StyledTextLabel><br />
+            </StyledTextLabelWrapper>
+            <DeleteBtn>
+              <span onClick={() => deleteText(text.id)}>X</span>
+            </DeleteBtn>
+          </StyledTextOptions>
+        ))}
+      </ul>
       <br />
       <TextInputForm onSubmit={evt => {
         evt.preventDefault();
         addTextToFrames(textRef.current.value);
       }}>
-        <input type="text" ref={textRef} />
-        <AddTextBtn onClick={() => addTextToFrames(textRef.current.value)}>Add</AddTextBtn>
+        <StyledTextInput type="text" ref={textRef} />
+        <StyledAddTextBtn onClick={() => addTextToFrames(textRef.current.value)}>Add</StyledAddTextBtn>
       </TextInputForm>
       <br />
       <br />
-      <ul>
-        {!TextManager.empty() && TextManager.getAll().map(text => (
-          <TextOptions key={text.id}>
-            <CheckboxAndLabelWrapper>
-              <input
-                type="checkbox"
-                id={text.id}
-                name="text_list"
-                value={text.id}
-                checked={text.id === selectedTextId}
-                onChange={evt => {
-                  // Commented out for now because this will soon be for when the user wants to hide text on certain frames
-                  // // Sometimes the user doesn't want any text selected, so allow for
-                  // // unchecking
-                  // if(selectedTextId === evt.target.value) {
-                  //   setSelectedTextId(null);
-                  // }
-                  // else {
-                  //   setSelectedTextId(evt.target.value);
-                  // }
-                }}
-              />
-              <TextLabel htmlFor={text.id}>{text.text}</TextLabel><br />
-            </CheckboxAndLabelWrapper>
-            <DeleteBtn>
-              <span onClick={() => deleteText(text.id)}>X</span>
-            </DeleteBtn>
-          </TextOptions>
-        ))}
-      </ul>
     </StyledSidebarDiv>
   );
 }
