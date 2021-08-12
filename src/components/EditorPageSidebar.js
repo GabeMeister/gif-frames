@@ -38,10 +38,9 @@ const StyledTextLabel = styled.span`
   text-shadow: 1px 1px 7px black;
 `;
 
-const DeleteBtn = styled.button`
+const DeleteBtn = styled.img`
   cursor: pointer;
-  font-size: 24px;
-  color: #FF4136;
+  width: 40px;
 `;
 
 const TextInputForm = styled.form`
@@ -134,9 +133,14 @@ export default function EditorPageSidebar() {
             <StyledTextLabelWrapper>
               <StyledTextLabel color={text.color}>{text.text}</StyledTextLabel><br />
             </StyledTextLabelWrapper>
-            <DeleteBtn>
-              <span onClick={() => deleteText(text.id)}>X</span>
-            </DeleteBtn>
+            <DeleteBtn
+              onClick={() => {
+                if(window.confirm('Are you sure you want to delete this text?')){
+                  deleteText(text.id);
+                }
+              }}
+              src="trash.png"
+            />
           </StyledTextOptions>
         ))}
       </ul>

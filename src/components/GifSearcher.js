@@ -51,7 +51,8 @@ const StyledThumbnail = styled.img`
   cursor: pointer;
   max-width: 300px;
   max-height: 200px;
-  border: ${props => props.selected ? '10px solid lightgreen' : 'none'};
+  border-radius: 3px;
+  border: ${props => props.selected ? '7px solid #19b888' : 'none'};
   box-sizing: border-box;
 `;
 

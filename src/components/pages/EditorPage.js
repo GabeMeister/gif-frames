@@ -16,7 +16,6 @@ import selectedTextIdState from "../state/atoms/selectedTextIdState";
 import ImageLayer from "../ImageLayer";
 import DraggableTextLayer from "../DraggableTextLayer";
 import BackgroundTextLayer from "../BackgroundTextLayer";
-import StyledControlsDiv from "../styled-components/StyledControlsDiv";
 import PositionBuffer from "../../data-models/PositionBuffer";
 import { renderText } from "../lib/frames";
 import useCountdownTimer from "../lib/useCountdownTimer";
@@ -24,10 +23,39 @@ import ProgressBar from "../ProgressBar";
 import { getPercent } from "../lib/math";
 import useQueryParam from "../lib/useQueryParam";
 
-const StyledEditorPageDiv = styled.div`
+const StyledEditorPage = styled.div`
   width: 1024px;
   margin: auto;
   height: 100vh;
+`;
+
+const MainPanelWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+`;
+
+const FrameWrapper = styled.div`
+  width: ${props => props.width};
+  height: ${props => props.height};
+  margin-left: 8px;
+  margin-right: 8px;
+`;
+
+const NavButton = styled(Button)`
+  margin-left: 3px;
+  margin-right: 3px;
+`;
+
+const FinishLinkWrapper = styled.div`
+  margin-top: 30px;
+  text-align: center;
+`;
+
+const ProgressTextWrapper = styled.div`
+  margin-top: 10px;
+  text-align: center;
 `;
 
 export default function EditorPage() {
@@ -224,7 +252,8 @@ export default function EditorPage() {
   const { 
     restart,
     stop,
-    number
+    // TODO: Add back in the right way
+    // number 
   } = useCountdownTimer({
     millisecondsPerStep: 200,
     startingNumber: 3,
@@ -246,51 +275,50 @@ export default function EditorPage() {
       keyName="enter,s,space,left,right,shift+left,shift+right"
       onKeyDown={handleKeydown}
     >
-      <StyledEditorPageDiv>
+      <StyledEditorPage>
         {frames.length !== 0 ? (
           <>
             <EditorPageSidebar textLayerData={frames[frameIdx].textLayerData} />
-            <div style={{ height: `${frames[frameIdx].textLayerData.height + 30}px` }}>
-              <ImageLayer
-                imageLayerData={frames[frameIdx].imageLayerData}
-              />
-              {backgroundTextList.length !== 0 && (
-                <BackgroundTextLayer
-                  textPlacements={backgroundTextList}
-                />
-              )}
-              {selectedTextId && (
-                <DraggableTextLayer
-                  key={selectedTextId}
-                  initialTextPlacement={frames[frameIdx].getTextPlacement(selectedTextId)}
-                />
-              )}
-            </div>
-            <Button onClick={() => goToBeginning()}>{'<<'}</Button>{' '}
-            <Button onClick={() => onPreviousFrame()}>{'<'}</Button>{' '}
-            <Button onClick={() => onNextFrame()}>{'>'}</Button>{' '}
-            <Button onClick={() => goToEnd()}>{'>>'}</Button>
+            <MainPanelWrapper>
+              <NavButton onClick={() => goToBeginning()}>{'<<'}</NavButton>{' '}
+              <NavButton onClick={() => onPreviousFrame()}>{'<'}</NavButton>
+              <div>
+                <FrameWrapper
+                  height={`${frames[frameIdx].textLayerData.height}px`}
+                  width={`${frames[frameIdx].textLayerData.width}px`}
+                >
+                  <ImageLayer
+                    imageLayerData={frames[frameIdx].imageLayerData}
+                  />
+                  {backgroundTextList.length !== 0 && (
+                    <BackgroundTextLayer
+                      textPlacements={backgroundTextList}
+                    />
+                  )}
+                  {selectedTextId && (
+                    <DraggableTextLayer
+                      key={selectedTextId}
+                      initialTextPlacement={frames[frameIdx].getTextPlacement(selectedTextId)}
+                    />
+                  )}
+                </FrameWrapper>
+                <ProgressTextWrapper>{frameIdx + 1} / {frames.length}</ProgressTextWrapper>
+              </div>
+              <NavButton onClick={() => onNextFrame()}>{'>'}</NavButton>{' '}
+              <NavButton onClick={() => goToEnd()}>{'>>'}</NavButton>
+            </MainPanelWrapper>
             <br />
             <ProgressBar percent={getPercent(frameIdx, frames.length - 1)} />
-            <StyledControlsDiv>
-              <div>
-                <h1>{frameIdx + 1} / {frames.length}</h1>
-              </div>
-              <br />
-              <Link className="link-btn" to={`/render?gifUrl=${gifUrl}`}>Preview & Finish</Link>
-              <br />
-              <br />
-              {isAutoplaying && (
-                <h1>Autoplay Timer: {number}</h1>
-              )}
-            </StyledControlsDiv>
+            <FinishLinkWrapper>
+              <Link className="link-btn large" to={`/render?gifUrl=${gifUrl}`}>Preview & Finish</Link>
+            </FinishLinkWrapper>
           </>
         ) : (
           <>
             <h1>Loading...</h1>
           </>
         )}
-      </StyledEditorPageDiv>
+      </StyledEditorPage>
     </Hotkeys>
   );
 }
