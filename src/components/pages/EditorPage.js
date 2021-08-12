@@ -22,6 +22,7 @@ import useCountdownTimer from "../lib/useCountdownTimer";
 import ProgressBar from "../ProgressBar";
 import { getPercent } from "../lib/math";
 import useQueryParam from "../lib/useQueryParam";
+import LoadingAnimation from "../LoadingAnimation";
 
 const StyledEditorPage = styled.div`
   width: 1024px;
@@ -56,6 +57,12 @@ const FinishLinkWrapper = styled.div`
 const ProgressTextWrapper = styled.div`
   margin-top: 10px;
   text-align: center;
+`;
+
+const LoadingAnimationWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default function EditorPage() {
@@ -314,9 +321,9 @@ export default function EditorPage() {
             </FinishLinkWrapper>
           </>
         ) : (
-          <>
-            <h1>Loading...</h1>
-          </>
+          <LoadingAnimationWrapper>
+            <LoadingAnimation />
+          </LoadingAnimationWrapper>
         )}
       </StyledEditorPage>
     </Hotkeys>

@@ -4,6 +4,7 @@ import Button from './Button';
 import StyledTextInput from './styled-components/StyledTextInput';
 
 import { useGifSearch } from './lib/hooks';
+import LoadingAnimation from './LoadingAnimation';
 
 const StyledGifSearcher = styled.div`
 `;
@@ -17,7 +18,7 @@ const StyledNextButton = styled(Button)`
   display: ${props => props.show ? 'inline' : 'none'}
 `;
 
-const StyledLoadingText = styled.div`
+const LoadingAnimationWrapper = styled.div`
   text-align: center;
   margin-top: 20px;
 `;
@@ -83,7 +84,9 @@ export default function GifSearcher({ onGifSelected }) {
         </StyledNextButton>
       </StyledSearchWrapper>
       {gifsLoading && (
-        <StyledLoadingText className="__StyledLoadingText">Loading...</StyledLoadingText>
+        <LoadingAnimationWrapper className="__LoadingAnimationWrapper">
+          <LoadingAnimation />
+        </LoadingAnimationWrapper>
       )}
       {gifsError && (
         <div>Error occurred while loading gifs...</div>

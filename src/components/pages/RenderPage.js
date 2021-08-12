@@ -8,6 +8,7 @@ import RenderPageSidebar from '../RenderPageSidebar';
 import delayState from "../state/atoms/delayState";
 import fontSizeState from "../state/atoms/fontSizeState";
 import { drawTextOnCanvas } from "../lib/fonts";
+import LoadingAnimation from "../LoadingAnimation";
 
 const StyledRenderPageDiv = styled.div`
   width: 1024px;
@@ -19,6 +20,22 @@ const StyledRenderPageDiv = styled.div`
 
 const StyledPreviewImg = styled.img`
   border-radius: 3px;
+`;
+
+const LoadingAnimationWrapper = styled.div`
+  text-align: center;
+`;
+
+const PreviewAreaWrapper = styled.div`
+  width: 1024px;
+  text-align: center;
+  margin-top: 30px;
+`;
+
+const DownloadButton = styled(Button)`
+  font-size: 18px;
+  padding: 8px 16px;
+  margin-top: 30px;
 `;
 
 export default function RenderPage() {
@@ -99,14 +116,16 @@ export default function RenderPage() {
     <StyledRenderPageDiv>
       <RenderPageSidebar />
       {loading ? (
-        <>
-          <h1>Loading...</h1>
-        </>
+        <LoadingAnimationWrapper>
+          <LoadingAnimation />
+        </LoadingAnimationWrapper>
       ) : (
         <>
-          <StyledPreviewImg src={blobUrl} alt="preview-gif" />
-          <br />
-          <Button onClick={() => downloadGif(blobUrl)}>Download</Button>
+          <PreviewAreaWrapper>
+            <StyledPreviewImg src={blobUrl} alt="preview-gif" />
+            <br />
+            <DownloadButton onClick={() => downloadGif(blobUrl)}>Download</DownloadButton>
+          </PreviewAreaWrapper>
         </>
       )}
     </StyledRenderPageDiv>
