@@ -5,6 +5,7 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import gifFrames from "gif-frames";
 import Hotkeys from "react-hot-keys";
 import { Link } from 'react-router-dom';
+import ReactTooltip from "react-tooltip";
 
 import EditorPageSidebar from "../EditorPageSidebar";
 import Button from "../Button";
@@ -287,7 +288,7 @@ export default function EditorPage() {
           <>
             <EditorPageSidebar textLayerData={frames[frameIdx].textLayerData} />
             <MainPanelWrapper>
-              <NavButton onClick={() => goToBeginning()}>{'<<'}</NavButton>{' '}
+              <NavButton onClick={() => goToBeginning()}>{'<<'}</NavButton>
               <NavButton onClick={() => onPreviousFrame()}>{'<'}</NavButton>
               <div>
                 <FrameWrapper
@@ -311,7 +312,11 @@ export default function EditorPage() {
                 </FrameWrapper>
                 <ProgressTextWrapper>{frameIdx + 1} / {frames.length}</ProgressTextWrapper>
               </div>
-              <NavButton onClick={() => onNextFrame()}>{'>'}</NavButton>{' '}
+              <NavButton
+                data-tip='Press "s" or "Enter" key to go to next frame'
+                onClick={() => onNextFrame()}
+              >{'>'}</NavButton>
+              <ReactTooltip effect='solid' />
               <NavButton onClick={() => goToEnd()}>{'>>'}</NavButton>
             </MainPanelWrapper>
             <br />
