@@ -26,7 +26,7 @@ export default function RenderPageSidebar() {
   }
   
   return (
-    <StyledSidebarDiv>
+    <StyledSidebarDiv className="__RenderPageSidebar">
       <ConfirmLink to='/' text={'← Create new gif'} />
       <br />
       <br />
@@ -35,6 +35,8 @@ export default function RenderPageSidebar() {
       <br />
       <br />
       Gif Playback Speed:
+      <br />
+      <br />
       <Slider
         min={1}
         max={MAX_DELAY}

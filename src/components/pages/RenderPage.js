@@ -10,24 +10,25 @@ import fontSizeState from "../state/atoms/fontSizeState";
 import { drawTextOnCanvas } from "../lib/fonts";
 import LoadingAnimation from "../LoadingAnimation";
 
-const StyledRenderPageDiv = styled.div`
-  width: 1024px;
+const StyledRenderPage = styled.div`
+  width: 100%;
   margin: auto;
   height: 100vh;
-  box-sizing: border-box;
-  padding: 10px;
+  display: flex;
 `;
 
 const StyledPreviewImg = styled.img`
   border-radius: 3px;
 `;
 
-const LoadingAnimationWrapper = styled.div`
+const StyledLoadingAnimation = styled.div`
   text-align: center;
+  flex-grow: 1;
+  padding-top: 50px;
 `;
 
-const PreviewAreaWrapper = styled.div`
-  width: 1024px;
+const StyledPreviewArea = styled.div`
+  flex-grow: 1;
   text-align: center;
   margin-top: 30px;
 `;
@@ -113,21 +114,19 @@ export default function RenderPage() {
   }, [delay, renderGif]);
 
   return (
-    <StyledRenderPageDiv>
+    <StyledRenderPage className="__StyledRenderPage">
       <RenderPageSidebar />
       {loading ? (
-        <LoadingAnimationWrapper>
+        <StyledLoadingAnimation className="__StyledLoadingAnimation">
           <LoadingAnimation />
-        </LoadingAnimationWrapper>
+        </StyledLoadingAnimation>
       ) : (
-        <>
-          <PreviewAreaWrapper>
-            <StyledPreviewImg src={blobUrl} alt="preview-gif" />
-            <br />
-            <DownloadButton onClick={() => downloadGif(blobUrl)}>Download</DownloadButton>
-          </PreviewAreaWrapper>
-        </>
+        <StyledPreviewArea>
+          <StyledPreviewImg src={blobUrl} alt="preview-gif" />
+          <br />
+          <DownloadButton onClick={() => downloadGif(blobUrl)}>Download</DownloadButton>
+        </StyledPreviewArea>
       )}
-    </StyledRenderPageDiv>
+    </StyledRenderPage>
   );
 }

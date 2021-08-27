@@ -111,7 +111,7 @@ export default function EditorPageSidebar() {
   }
   
   return (
-    <StyledSidebarDiv>
+    <StyledSidebarDiv className="__EditorPageSidebar">
       <ConfirmLink to="/" />
       <br />
       <br />

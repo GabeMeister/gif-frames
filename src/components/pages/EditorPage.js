@@ -26,12 +26,13 @@ import useQueryParam from "../lib/useQueryParam";
 import LoadingAnimation from "../LoadingAnimation";
 
 const StyledEditorPage = styled.div`
-  width: 1024px;
+  width: 100%;
   margin: auto;
   height: 100vh;
+  display: flex;
 `;
 
-const MainPanelWrapper = styled.div`
+const GifFrameWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,9 +62,15 @@ const ProgressTextWrapper = styled.div`
 `;
 
 const LoadingAnimationWrapper = styled.div`
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const StyledAppContent = styled.div`
+  flex-grow: 1;
+  min-width: 700px;
 `;
 
 export default function EditorPage() {
@@ -281,47 +288,48 @@ export default function EditorPage() {
       keyName="enter,s,space,left,right,shift+left,shift+right"
       onKeyDown={handleKeydown}
     >
-      <StyledEditorPage>
+      <StyledEditorPage className="__StyledEditorPage">
         {frames.length !== 0 ? (
           <>
             <EditorPageSidebar textLayerData={frames[frameIdx].textLayerData} />
-            <MainPanelWrapper>
-              <NavButton onClick={() => goToBeginning()}>{'<<'}</NavButton>
-              <NavButton onClick={() => onPreviousFrame()}>{'<'}</NavButton>
-              <div>
-                <FrameWrapper
-                  height={`${frames[frameIdx].textLayerData.height}px`}
-                  width={`${frames[frameIdx].textLayerData.width}px`}
-                >
-                  <ImageLayer
-                    imageLayerData={frames[frameIdx].imageLayerData}
-                  />
-                  {backgroundTextList.length !== 0 && (
-                    <BackgroundTextLayer
-                      textPlacements={backgroundTextList}
+            <StyledAppContent className="__StyledAppContent">
+              <GifFrameWrapper className="__GifFrameWrapper">
+                <NavButton onClick={() => goToBeginning()}>{'<<'}</NavButton>
+                <NavButton onClick={() => onPreviousFrame()}>{'<'}</NavButton>
+                <div>
+                  <FrameWrapper
+                    height={`${frames[frameIdx].textLayerData.height}px`}
+                    width={`${frames[frameIdx].textLayerData.width}px`}
+                  >
+                    <ImageLayer
+                      imageLayerData={frames[frameIdx].imageLayerData}
                     />
-                  )}
-                  {selectedTextId && (
-                    <DraggableTextLayer
-                      key={selectedTextId}
-                      initialTextPlacement={frames[frameIdx].getTextPlacement(selectedTextId)}
-                    />
-                  )}
-                </FrameWrapper>
-                <ProgressTextWrapper>{frameIdx + 1} / {frames.length}</ProgressTextWrapper>
-              </div>
-              <NavButton
-                data-tip='Press "s" or "Enter" key to go to next frame'
-                onClick={() => onNextFrame()}
-              >{'>'}</NavButton>
-              <ReactTooltip effect='solid' />
-              <NavButton onClick={() => goToEnd()}>{'>>'}</NavButton>
-            </MainPanelWrapper>
-            <br />
-            <ProgressBar percent={getPercent(frameIdx, frames.length - 1)} />
-            <FinishLinkWrapper>
-              <Link className="link-btn large" to={`/render?gifUrl=${gifUrl}`}>Preview & Finish</Link>
-            </FinishLinkWrapper>
+                    {backgroundTextList.length !== 0 && (
+                      <BackgroundTextLayer
+                        textPlacements={backgroundTextList}
+                      />
+                    )}
+                    {selectedTextId && (
+                      <DraggableTextLayer
+                        key={selectedTextId}
+                        initialTextPlacement={frames[frameIdx].getTextPlacement(selectedTextId)}
+                      />
+                    )}
+                  </FrameWrapper>
+                  <ProgressTextWrapper>{frameIdx + 1} / {frames.length}</ProgressTextWrapper>
+                </div>
+                <NavButton
+                  data-tip='Press "s" or "Enter" key to go to next frame'
+                  onClick={() => onNextFrame()}
+                >{'>'}</NavButton>
+                <ReactTooltip effect='solid' />
+                <NavButton onClick={() => goToEnd()}>{'>>'}</NavButton>
+              </GifFrameWrapper>
+              <ProgressBar percent={getPercent(frameIdx, frames.length - 1)} />
+              <FinishLinkWrapper>
+                <Link className="link-btn large" to={`/render?gifUrl=${gifUrl}`}>Preview & Finish</Link>
+              </FinishLinkWrapper>
+            </StyledAppContent>
           </>
         ) : (
           <LoadingAnimationWrapper>

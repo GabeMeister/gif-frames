@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Masonry } from 'masonic';
 
 import { useGifSearch } from './lib/hooks';
-import Button from './Button';
 import LoadingAnimation from './LoadingAnimation';
 import StyledTextInput from './styled-components/StyledTextInput';
 import GifThumbnail from './GifThumbnail';
@@ -16,10 +15,6 @@ const StyledGifSearcher = styled.div`
 const StyledSearchWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
-`;
-
-const StyledNextButton = styled(Button)`
-  display: ${props => props.show ? 'inline' : 'none'}
 `;
 
 const LoadingAnimationWrapper = styled.div`
@@ -45,9 +40,10 @@ export default function GifSearcher({ onGifSelected }) {
         {...props}
         selected={selectedGif && selectedGif.id === data.id}
         onClick={() => setSelectedGif(data)}
+        onGifSelected={() => onGifSelected(data.url)}
       />
     );
-  }, [selectedGif]);
+  }, [selectedGif, onGifSelected]);
 
   return (
     <StyledGifSearcher className="__StyledGifSearcher">
@@ -60,13 +56,6 @@ export default function GifSearcher({ onGifSelected }) {
           onChange={() => setSearchWord(searchWordRef.current.value)}
           placeholder="Search for a gif..."
         />
-        <StyledNextButton
-          className="__StyledNextButton"
-          show={selectedGif !== null}
-          onClick={() => onGifSelected(selectedGif.url)}
-        >
-          Next →
-        </StyledNextButton>
       </StyledSearchWrapper>
       {gifsLoading && (
         <LoadingAnimationWrapper className="__LoadingAnimationWrapper">

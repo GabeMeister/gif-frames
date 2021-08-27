@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 const StyledSidebarDiv = styled.ul`
-  position: absolute;
+  // position: absolute;
   left: 0;
   top: 0;
   width: 250px;

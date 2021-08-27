@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+import Button from './Button';
+
 const StyledGifThumbnail = styled.div`
   min-height: 150px;
   width: 100%;
@@ -40,7 +42,11 @@ const StyledLoadingAnimation = styled.img`
   position: absolute;
 `;
 
-export default function GifThumbnail({ data, selected, onClick }) {
+const StyledNextButton = styled(Button)`
+  position: absolute;
+`;
+
+export default function GifThumbnail({ data, selected, onClick, onGifSelected }) {
   const [showGif, setShowGif] = useState(false);
   const [loading, setLoading] = useState(true);
   
@@ -76,6 +82,14 @@ export default function GifThumbnail({ data, selected, onClick }) {
         <StyledLoadingAnimation
           src="loading-circle.gif"
         />
+      )}
+      {selected && (
+        <StyledNextButton
+          className="__StyledNextButton"
+          onClick={() => onGifSelected(data.url)}
+        >
+          Next →
+        </StyledNextButton>
       )}
     </StyledGifThumbnail>
   );
