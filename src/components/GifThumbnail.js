@@ -16,8 +16,13 @@ const StyledGifThumbnail = styled.div`
 const StyledImage = styled.img`
   width: 100%;
   border-radius: 5px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
-  border: ${props => props.selected ? '8px solid green' : '0'}
+  box-shadow: 1px 5px 15px rgba(0, 0, 0, .12);
+  border: ${props => props.selected ? '5px solid green' : '0'};
+  transition: transform 100ms ease-in-out;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 
 const StyledLoadingAnimation = styled.img`
@@ -30,7 +35,7 @@ const StyledLoadingAnimation = styled.img`
     }
   }
 
-  animation: fading ease-in .5s;
+  animation: fading ease-in .2s;
   width: 12%;
   position: absolute;
 `;

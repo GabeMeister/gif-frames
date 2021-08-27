@@ -16,7 +16,7 @@ import Spacer from '../Spacer';
 const StyledHomePage = styled.div`
   padding: 20px;
   padding-top: 40px;
-  max-width: 90%;
+  max-width: 80%;
   margin: auto;
 `;
 
