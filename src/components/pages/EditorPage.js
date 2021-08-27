@@ -259,9 +259,7 @@ export default function EditorPage() {
 
   const { 
     restart,
-    stop,
-    // TODO: Add back in the right way
-    // number 
+    stop
   } = useCountdownTimer({
     millisecondsPerStep: 200,
     startingNumber: 3,

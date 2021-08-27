@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Spacer from './Spacer';
 
 const StyledRadioTab = styled.div`
-  width: 800px;
+  max-width: 100%;
   margin: auto;
 `;
 

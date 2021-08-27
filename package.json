@@ -12,6 +12,7 @@
     "gif.js.optimized": "^1.0.1",
     "jquery": "^3.5.1",
     "lodash.clonedeep": "^4.5.0",
+    "masonic": "^3.4.1",
     "md5": "^2.3.0",
     "postcss": "^7",
     "rc-progress": "^3.1.4",

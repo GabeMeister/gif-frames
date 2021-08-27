@@ -16,7 +16,7 @@ import Spacer from '../Spacer';
 const StyledHomePage = styled.div`
   padding: 20px;
   padding-top: 40px;
-  width: 1280px;
+  max-width: 90%;
   margin: auto;
 `;
 
@@ -52,7 +52,7 @@ export default function HomePage() {
       {redirecting ? (
         <Redirect to={`/editor?gifUrl=${gifUrl}`} />
       ) : (
-          <StyledHomePage>
+          <StyledHomePage className="__StyledHomePage">
             <StyledHeadline className="AgentOrange">Text Gif</StyledHeadline>
             <Spacer height="40px" />
             <RadioTab options={[

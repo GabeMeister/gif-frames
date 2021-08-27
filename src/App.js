@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import $ from 'jquery';
 import {
   BrowserRouter as Router,
@@ -22,6 +22,12 @@ const StyledApp = styled.div`
 window.$ = $;
 
 function App() {
+  useEffect(() => {
+    // Preload loading circle gif when app starts for ultimate speed
+    const img = new Image();
+    img.src = 'loading-circle.gif';
+  }, []);
+  
   return (
     <StyledApp>
       <Router>

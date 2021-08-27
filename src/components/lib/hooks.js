@@ -33,5 +33,5 @@ export const useGifSearch = ({ text }) => {
     }
   }, [text, fetchGifs]);
 
-  return [results.slice(0, 20), loading, error];
+  return [results.slice(0, 50), loading, error];
 };

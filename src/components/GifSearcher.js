@@ -1,12 +1,16 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
-import Button from './Button';
-import StyledTextInput from './styled-components/StyledTextInput';
+import { Masonry } from 'masonic';
 
 import { useGifSearch } from './lib/hooks';
+import Button from './Button';
 import LoadingAnimation from './LoadingAnimation';
+import StyledTextInput from './styled-components/StyledTextInput';
+import GifThumbnail from './GifThumbnail';
+import { useCallback } from 'react';
 
 const StyledGifSearcher = styled.div`
+
 `;
 
 const StyledSearchWrapper = styled.div`
@@ -23,46 +27,27 @@ const LoadingAnimationWrapper = styled.div`
   margin-top: 20px;
 `;
 
-const StyledGifViewer = styled.div`
-  width: 1600px;
-  margin: auto;
+const StyledMasonryWrapper = styled.div`
   margin-top: 20px;
-  height: 650px;
-  overflow: scroll;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-
-  // WEIRD HACK: put a child container in a parent div where the child container
-  // is wider than the parent
-  position: absolute;
-  left: 0;
-  right: 0;
-`;
-
-const StyledThumbnailWrapper = styled.div`
-  margin-right: 10px;
-  margin-top: 10px;
-  max-height: 200px;
-  width: 300px;
-  object-fit: contain;
-`;
-
-const StyledThumbnail = styled.img`
-  cursor: pointer;
-  max-width: 300px;
-  max-height: 200px;
-  border-radius: 3px;
-  border: ${props => props.selected ? '7px solid #19b888' : 'none'};
-  box-sizing: border-box;
 `;
 
 export default function GifSearcher({ onGifSelected }) {
   const searchWordRef = useRef(null);
-  const [hoveredGifId, setHoveredGifId] = useState('');
   const [searchWord, setSearchWord] = useState('');
   const [gifs, gifsLoading, gifsError] = useGifSearch({ text: searchWord });
   const [selectedGif, setSelectedGif] = useState(null);
+
+  const GifThumbnailWrapper = useCallback(props => {
+    const data = props.data;
+
+    return (
+      <GifThumbnail
+        {...props}
+        selected={selectedGif && selectedGif.id === data.id}
+        onClick={() => setSelectedGif(data)}
+      />
+    );
+  }, [selectedGif]);
 
   return (
     <StyledGifSearcher className="__StyledGifSearcher">
@@ -92,26 +77,14 @@ export default function GifSearcher({ onGifSelected }) {
         <div>Error occurred while loading gifs...</div>
       )}
       {!!gifs.length && (
-        <StyledGifViewer className="__StyledGifViewer">
-          {
-            gifs.map(gif => (
-              <StyledThumbnailWrapper>
-                <StyledThumbnail
-                  className="__StyledThumbnail"
-                  selected={selectedGif !== null && gif.id === selectedGif.id}
-                  key={gif.id}
-                  alt="gif_thumbnail_preview"
-                  src={(hoveredGifId === gif.id) || (selectedGif !== null && selectedGif.id === gif.id) ? gif.url : gif.thumbnail}
-                  onMouseEnter={() => setHoveredGifId(gif.id)}
-                  onMouseLeave={() => setHoveredGifId('')}
-                  onClick={() => {
-                    setSelectedGif(gif);
-                  }}
-                />
-              </StyledThumbnailWrapper>
-            ))
-          }
-        </StyledGifViewer>
+        <StyledMasonryWrapper>
+          <Masonry
+            items={gifs}
+            columnGutter={15}
+            columnWidth={250}
+            render={GifThumbnailWrapper}
+          />
+        </StyledMasonryWrapper>
       )}
     </StyledGifSearcher>
   );
