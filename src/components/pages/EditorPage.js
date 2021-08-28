@@ -20,8 +20,7 @@ import BackgroundTextLayer from "../BackgroundTextLayer";
 import PositionBuffer from "../../data-models/PositionBuffer";
 import { renderText } from "../lib/frames";
 import useCountdownTimer from "../lib/useCountdownTimer";
-import ProgressBar from "../ProgressBar";
-import { getPercent } from "../lib/math";
+import FrameSlider from "../FrameSlider";
 import useQueryParam from "../lib/useQueryParam";
 import LoadingAnimation from "../LoadingAnimation";
 
@@ -325,7 +324,18 @@ export default function EditorPage() {
                 <ReactTooltip effect='solid' />
                 <NavButton onClick={() => goToEnd()}>{'>>'}</NavButton>
               </GifFrameWrapper>
-              <ProgressBar percent={getPercent(frameIdx, frames.length - 1)} />
+              <FrameSlider
+                current={frameIdx}
+                total={frames.length}
+                onFrameChange={newFrameIdx => {
+                  if(newFrameIdx > frameIdx) {
+                    onNextFrame();
+                  }
+                  else if(newFrameIdx < frameIdx) {
+                    onPreviousFrame();
+                  }
+                }}
+              />
               <FinishLinkWrapper>
                 <Link className="link-btn large" to={`/render?gifUrl=${gifUrl}`}>Preview & Finish</Link>
               </FinishLinkWrapper>
